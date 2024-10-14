@@ -1,10 +1,8 @@
 from app import create_app
+from application.config import Config
 
-app = create_app()
+app = create_app(Config)
+from application.routes import *
 
-@app.route('/')
-def index():
-    return 'Hello, World!'
-
-if __name__ == '__main__':
-    app.run()
+if __name__ == "__main__":
+    app.run(debug=True)

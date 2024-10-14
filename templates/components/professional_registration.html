@@ -1,0 +1,31 @@
+<!-- Service  -->
+
+<div class="form-group">
+    <label for="service">Service</label>
+    <select class="form-control" id="service" name="service" ng-model="professional.service"
+        ng-options="service as service.name for service in available_services" required>
+        <option value="">Select a service</option>
+        {% for service in available_services %}
+        <option value="{{ service.id }}">{{ service.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+<!-- Description -->
+<div class="form-group mb-3">
+    <label for="desc" class="form-label">Description</label>
+    <textarea name="desc" class="form-control" id="desc" placeholder="Enter the description of your service" rows="4"
+        required></textarea>
+</div>
+
+<!-- Experience -->
+<div class="form-group mb-3">
+    <label for="experience" class="form-label">Experience</label>
+    <input name="experience" class="form-control" type="number" id="experience" placeholder="Experience in years"
+        required>
+</div>
+
+<!-- Experince documet pdf -->
+<div class="form-group mb-3">
+    <label for="experience_doc" class="form-label">Experience Document</label>
+    <input name="experience_doc" class="form-control" type="file" id="experience_doc" accept="application/pdf" required>
+</div>
