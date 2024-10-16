@@ -33,17 +33,13 @@ def create_roles():
 
 def create_services():
     """Create services if not exist."""
-    if not Service.query.filter_by(name="Electrician").first():
-        db.session.add(Service(name="Electrician", base_price=100))
-
-    if not Service.query.filter_by(name="Plumber").first():
-        db.session.add(Service(name="Plumber", base_price=150))
-
-    if not Service.query.filter_by(name="Carpenter").first():
-        db.session.add(Service(name="Carpenter", base_price=200))
+    if not Service.query.filter_by(name="NoService").first():
+        db.session.add(
+            Service(name="NoService", description="No service selected", base_price=0)
+        )
 
     db.session.commit()
-    print("Services created")
+    print("NoService created")
 
 
 def create_static_storage(static_path):

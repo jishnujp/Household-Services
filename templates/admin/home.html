@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Section 1 : Services-->
+<div>
+    <div>
+        <h2>Services</h2>
+    </div>
+    <div>
+        <!-- Table -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Service Name</th>
+                    <th>Base Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in services %}
+                <tr>
+                    <td>{{ service.id }}</td>
+                    <td>{{ service.name }}</td>
+                    <td>{{ service.base_price }}</td>
+                    <td>
+                        <!-- service_modal inside the loop - with service variable (edit) -->
+                        {% include 'components/service_modal.html' %}
+                        {% include 'components/del_service_modal.html' %}
+                    </td>
+                </tr>
+                {% endfor %}
+        </table>
+    </div>
+    <!-- service_modal outside the loop - without service variable (add) -->
+    {% include 'components/service_modal.html' %}
+</div>
+
+
+<!-- Section 2: Professionals -->
+<div>
+    <div>
+        <h2>Professionals</h2>
+    </div>
+    <div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Profile</th>
+                    <th>Experience</th>
+                    <th>Service</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for professional in professionals %}
+                <tr>
+                    <td>{{ professional.id }}</td>
+                    <td>{{ professional.username }}</td>
+                    <td><img src="{{ url_for('static', filename=professional.user.profile_pic) }}"
+                            alt="{{ professional.name }}" width="100" height="100"></td>
+                    <td>{{ professional.experience }}</td>
+                    <td>{{ professional.service.name }}</td>
+                    <td>
+                        {% if professional.is_approved == False %}
+                        <a href="{{ url_for('approve_professional', id=professional.id) }}"
+                            class="btn btn-success">Approve</a>
+                        {% else %}
+                        <a href="{{ url_for('block_professional', id=professional.id) }}"
+                            class="btn btn-danger">block</a>
+                        {% endif %}
+                        {% include 'components/view_professional_modal.html' %}
+
+                    </td>
+                </tr>
+                {% endfor %}
+        </table>
+    </div>
+</div>
+
+<!--   Section3: Service Requests -->
+<div>
+    <div>
+        <h2>Service Requests</h2>
+    </div>
+    <div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Assigned Professional</th>
+                    <th>Requested date</th>
+                    <th>Status</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for requests in service_requests %}
+                <tr>
+                    <td>{{ requests.id }}</td>
+                    <td>{{ requests.professional_details.username }}</td>
+                    <td>{{ requests.requested_date }}</td>
+                    <td>{{ requests.status }}</td>
+                    <td>
+                        <a href="#">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

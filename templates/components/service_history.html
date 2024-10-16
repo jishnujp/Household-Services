@@ -1,0 +1,32 @@
+<div>
+    <div>
+        <h2>Service History</h2>
+    </div>
+    <div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date of Request</th>
+                    <th>Service Name</th>
+                    <th>Professional Name</th>
+                    <th>Phone number</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                <tr>
+                    <td>{{ request.id }}</td>
+                    <td>{{ request.date_of_request }}</td>
+                    <td>--</td>
+                    <!-- <td>{{ request.professional_details.service }}</td> -->
+                    <td>{{ request.professional_details.username }}</td>
+                    <td>{{ request.professional_details.phone }}</td>
+                    <td>{{ request.status }}</td>
+
+                </tr>
+                {% endfor %}
+        </table>
+    </div>
+</div>

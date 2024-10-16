@@ -15,14 +15,7 @@
 
 <body>
     <div>
-        {% block navbar %}
-        {% if not session.user %}
-        {% include 'components/nav/nav-auth.html' %}
-        {% else %}
         {% include 'components/nav/nav.html' %}
-        {% endif %}
-        {% endblock %}
-
     </div>
     <div>
         {% with messages = get_flashed_messages(with_categories=true) %}

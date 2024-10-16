@@ -42,8 +42,10 @@ class ProfessionalDetails(db.Model):
     experience = db.Column(db.Integer, nullable=False)
     document = db.Column(db.String(50), nullable=False)
     extra_price = db.Column(db.Integer, default=0)
+    is_approved = db.Column(db.Boolean, default=False)
     username = db.Column(db.String(20), db.ForeignKey("user.username"), nullable=False)
-
+    ## TODO: Add Service relationship,
+    ## TODO: Add Business name
     user = db.relationship("User", back_populates="professional_details")
     service_requests = db.relationship(
         "ServiceRequest", back_populates="professional_details", lazy=True
@@ -53,6 +55,7 @@ class ProfessionalDetails(db.Model):
 class Service(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False, unique=True)
+    description = db.Column(db.String(100), nullable=False)
     base_price = db.Column(db.Integer, nullable=False)
 
     professionals = db.relationship("ProfessionalDetails", backref="service", lazy=True)
