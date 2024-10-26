@@ -2,6 +2,7 @@ from main import app
 from flask import render_template, request, redirect, url_for, flash, session, abort
 from application.models import *
 from functools import wraps
+from application.utils import hash_file_object
 
 
 # login required decorator for admin, customer and professional
@@ -114,7 +115,11 @@ def register(role):
         phone = request.form.get("phone")
         profile_pic = request.files.get("profile_pic")
         if profile_pic:
-            profile_name = f"storage/profile_pics/{profile_pic.filename}"
+            # get the md5 hash of the file, to avoid duplicate file names
+            md5_hash = hash_file_object(profile_pic)
+            profile_name = (
+                f"storage/profile_pics/{md5_hash}.{profile_pic.filename.split('.')[-1]}"
+            )
             profile_location = url_for("static", filename=profile_name)
             profile_pic.save(f"{app.root_path}{profile_location}")
         else:
@@ -132,16 +137,19 @@ def register(role):
             experience = request.form.get("experience")
             document = request.files.get("experience_doc")
             if document:
-                static_location = url_for("static", filename="storage/documents")
-                document_path = f"{app.root_path}{static_location}/{document.filename}"
-                document.save(document_path)
+                md5_hash = hash_file_object(document)
+                pdf_file_name = (
+                    f"storage/documents/{md5_hash}.{document.filename.split('.')[-1]}"
+                )
+                document_path = url_for("static", filename=pdf_file_name)
+                document.save(f"{app.root_path}{document_path}")
             else:
                 document_path = None
             professional_details = ProfessionalDetails(
                 service_id=service_id,
                 description=description,
                 experience=int(experience),
-                document=document_path,
+                document=pdf_file_name,
             )
             db.session.add(professional_details)
             user = User(

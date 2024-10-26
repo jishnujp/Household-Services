@@ -20,8 +20,8 @@
                 <div class="container">
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <img src="{{ url_for('static', filename='profile_pics/' + professional.user.profile_pic) }}"
-                                class="img-fluid rounded-circle" alt="Profile Picture">
+                            <img src="{{ url_for('static', filename= professional.user.profile_pic) }}"
+                                class="img-fluid" alt="Profile Picture" max-height="200">
                         </div>
                         <div class="col-md-8">
                             <h3>{{ professional.user.full_name }}</h3>
@@ -39,9 +39,10 @@
                     <p><strong>Service ID:</strong> {{ professional.service_id }}</p>
                     <p><strong>Description:</strong> {{ professional.description }}</p>
                     <p><strong>Experience (years):</strong> {{ professional.experience }}</p>
-                    <p><strong>Document:</strong> <a
-                            href="{{ url_for('static', filename='documents/' + professional.document) }}"
+                    <p><strong>Document:</strong> <a href="{{ url_for('static', filename=professional.document) }}"
                             target="_blank">{{ professional.document }}</a></p>
+                    <embed src="{{ url_for('static', filename=professional.document) }}" type="application/pdf"
+                        width="100%" height="600px" />
                     <p><strong>Extra Price:</strong> ₹{{ professional.extra_price }}</p>
                     <p><strong>Approved:</strong> {{ 'Yes' if professional.is_approved else 'No' }}</p>
                 </div>
