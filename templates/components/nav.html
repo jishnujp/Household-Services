@@ -28,6 +28,21 @@
                     <a class="nav-link" href="{{ url_for('about') }}">About</a>
                     {%endif%}
                 </li>
+                {% if not session.get('user')%}
+                <!-- dropdown register -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Register
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <li><a class="dropdown-item" href="{{ url_for('register', role='customer') }}">Customer</a></li>
+                        <li><a class="dropdown-item"
+                                href="{{ url_for('register', role='professional') }}">Professional</a>
+                        </li>
+                    </ul>
+                </li>
+                {%endif%}
                 <li class="nav-item">
                     {% if session.get('user')%}
                     <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
