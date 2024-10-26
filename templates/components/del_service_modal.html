@@ -1,10 +1,11 @@
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteService">
+<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#del_{{service.id}}">
     Delete
 </button>
 
 <!-- Modal -->
-<div class="modal fade" id="deleteService" tabindex="-1" aria-labelledby="deleteServiceLabel" aria-hidden="true">
+<div class="modal fade" id="del_{{service.id}}" tabindex="-1" aria-labelledby="del_{{service.id}}_label"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ url_for('delete_service', id=service.id) }}" method="POST">
