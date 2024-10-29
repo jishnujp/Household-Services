@@ -3,6 +3,7 @@ from flask import render_template, request, redirect, url_for, flash, session, a
 from application.models import *
 from functools import wraps
 from application.utils import hash_file_object
+from datetime import datetime
 
 
 # login required decorator for admin, customer and professional
@@ -309,8 +310,12 @@ def customer_home():
     service_id = request.args.get("service")
     if service_id and service_id != "all":
 
-        # get ProfessionalDetails for the selected service
-        professionals = ProfessionalDetails.query.filter_by(service_id=service_id).all()
+        # get ProfessionalDetails for the selected service that are approved
+        professionals = (
+            ProfessionalDetails.query.filter_by(service_id=service_id)
+            .filter_by(is_approved=True)
+            .all()
+        )
         # get the selected service
         selected_service = Service.query.get(service_id)
         return render_template(
@@ -338,8 +343,24 @@ def customer_summary():
 @login_required("customer")
 def book_service(id):
     professional = ProfessionalDetails.query.get(id)
+
+    user = User.query.get(session["user"])
+    # TODO: Check if the professinoal is approved
     if request.method == "POST":
-        print(f"Service requested by {session[id]} to {professional.username}")
+        print(f"Service requested by {user.username} to {professional.user.username}")
+        service_date = request.form.get("service_date")
+        service_date = datetime.strptime(service_date, "%Y-%m-%d")
+        service_request = ServiceRequest(
+            customer_id=session["user"],
+            professional_details_id=id,
+            service_id=professional.service_id,
+            date_of_service=service_date,
+            remarks=request.form.get("remarks"),
+            professional_details=professional,
+            user=user,
+        )
+        db.session.add(service_request)
+        db.session.commit()
         flash("Service booked successfully", "success")
         return redirect(url_for("customer_home"))
     elif request.method == "GET":
