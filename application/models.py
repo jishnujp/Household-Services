@@ -72,6 +72,8 @@ class ServiceRequest(db.Model):
     date_of_service = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), nullable=False, default="Pending")
     remarks = db.Column(db.String(100), nullable=False)
+    review = db.Column(db.String(100), nullable=True)
+    rating = db.Column(db.Integer, nullable=True)
 
     professional_details = db.relationship(
         "ProfessionalDetails", back_populates="service_requests", lazy=True
