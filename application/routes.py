@@ -370,7 +370,30 @@ def book_service(id):
 @app.route("/professional/home")
 @login_required("professional")
 def professional_home():
-    return render_template("professional/home.html")
+    print(session["user"])
+    professional = User.query.get(session["user"]).professional_details
+    service_requests = ServiceRequest.query.filter_by(
+        professional_details_id=professional.id
+    ).all()
+    todays_services, upcoming_services = [], []
+    # todays date
+    today = datetime.now()
+    for service in service_requests:
+        # compare only date, not time
+        if service.date_of_service.date() == today.date():
+            todays_services.append(service)
+        elif service.date_of_service.date() > today.date():
+            upcoming_services.append(service)
+    completed_services = [
+        service for service in service_requests if service.status == "Completed"
+    ]
+    return render_template(
+        "professional/home.html",
+        professional=professional,
+        todays_services=todays_services,
+        upcoming_services=upcoming_services,
+        completed_services=completed_services,
+    )
 
 
 @app.route("/professional/search")
@@ -383,6 +406,26 @@ def professional_search():
 @login_required("professional")
 def professional_summary():
     return render_template("professional/summary.html")
+
+
+@app.route("/professional/accept_service/<int:id>")
+@login_required("professional")
+def accept_service_request(id):
+    service_request = ServiceRequest.query.get(id)
+    service_request.status = "Accepted"
+    db.session.commit()
+    flash("Service accepted", "success")
+    return redirect(url_for("professional_home"))
+
+
+@app.route("/professional/reject_service/<int:id>")
+@login_required("professional")
+def reject_service_request(id):
+    service_request = ServiceRequest.query.get(id)
+    service_request.status = "Rejected"
+    db.session.commit()
+    flash("Service rejected", "success")
+    return redirect(url_for("professional_home"))
 
 
 @app.route("/home")

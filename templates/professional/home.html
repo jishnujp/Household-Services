@@ -1,7 +1,89 @@
 {% extends 'base.html' %}
 
-{% block title %}Search{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
-Home Page for Professional
+<h1>{{ professional.user.full_name}} </h1>
+<br>
+<h2>Todays Services</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Customer Name</th>
+            <th>Contact Number</th>
+            <th>Location</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    {% for service in todays_services %}
+    <tr>
+        <td>{{ service.id }}</td>
+        <td>{{ service.user.full_name }}</td>
+        <td>{{ service.user.phone }}</td>
+        <td>{{ service.user.address }} <br>Pincode: {{ service.user.pincode }} </td>
+        <td>
+            {% if service.status == 'Pending' %}
+            <a href="{{ url_for('accept_service_request', id=service.id) }}" class="btn btn-success">Accept</a>
+            <a href="{{ url_for('reject_service_request', id=service.id) }}" class="btn btn-danger">Reject</a>
+            {% endif %}
+            <a href="#">View</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<br>
+<h2>Upcoming Services</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Customer Name</th>
+            <th>Contact Number</th>
+            <th>Location</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    {% for service in upcoming_services %}
+    <tr>
+        <td>{{ service.id }}</td>
+        <td>{{ service.user.full_name }}</td>
+        <td>{{ service.user.phone }}</td>
+        <td>{{ service.user.address }} <br>Pincode: {{ service.user.pincode }} </td>
+        <td>
+            {% if service.status == 'Pending' %}
+            <a href="{{ url_for('accept_service_request', id=service.id) }}" class="btn btn-success">Accept</a>
+            <a href="{{ url_for('reject_service_request', id=service.id) }}" class="btn btn-danger">Reject</a>
+            {% endif %}
+            <a href="#">View</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<br>
+<h2>Completed Services</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Customer Name</th>
+            <th>Contact Number</th>
+            <th>Location</th>
+            <th>Date</th>
+            <th>Review</th>
+            <th>Rating</th>
+        </tr>
+    </thead>
+    {% for service in completed_services %}
+    <tr>
+        <td>{{ service.id }}</td>
+        <td>{{ service.user.full_name }}</td>
+        <td>{{ service.user.phone }}</td>
+        <td>{{ service.user.address }} <br>Pincode: {{ service.user.pincode }} </td>
+        <td>{{ service.date_of_service }}</td>
+        <td>{{ service.review }}</td>
+        <td>{{ service.rating }}</td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}
