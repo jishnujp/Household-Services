@@ -308,6 +308,7 @@ def admin_summary():
 @login_required("customer")
 def customer_home():
     service_id = request.args.get("service")
+    request_history = ServiceRequest.query.filter_by(customer_id=session["user"]).all()
     if service_id and service_id != "all":
 
         # get ProfessionalDetails for the selected service that are approved
@@ -322,9 +323,12 @@ def customer_home():
             "customer/home.html",
             professionals=professionals,
             selected_service=selected_service,
+            request_history=request_history,
         )
     all_service = Service.query.filter(Service.name != "NoService").all()
-    return render_template("customer/home.html", services=all_service)
+    return render_template(
+        "customer/home.html", services=all_service, request_history=request_history
+    )
 
 
 @app.route("/customer/search")

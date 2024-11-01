@@ -7,23 +7,46 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Date of Request</th>
-                    <th>Service Name</th>
-                    <th>Professional Name</th>
-                    <th>Phone number</th>
+                    <th>Service Date</th>
+                    <th>Service Type</th>
+                    <th>Service Provider</th>
                     <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for request in requests %}
+                {% for request in request_history %}
                 <tr>
                     <td>{{ request.id }}</td>
-                    <td>{{ request.date_of_request }}</td>
+                    <td>{{ request.date_of_service.date() }}</td>
                     <td>--</td>
                     <!-- <td>{{ request.professional_details.service }}</td> -->
-                    <td>{{ request.professional_details.username }}</td>
-                    <td>{{ request.professional_details.phone }}</td>
+                    <td>
+                        {{ request.professional_details.user.full_name }}
+                        <br>
+                        ph: {{ request.professional_details.user.phone }}
+                        <br>
+                        <!-- set the variable professional = request.professional_details in jijna-->
+                        {% set professional = request.professional_details %}
+                        {% include 'components/view_professional_modal.html' %}
+                    </td>
+
                     <td>{{ request.status }}</td>
+                    <td>
+                        {% if request.status == 'Completed' and request.review == None %}
+                        <a href="#" class="btn btn-success">Add Review</a>
+                        {% elif request.status == 'Completed' and request.review != None %}
+                        <a href="#" class="btn btn-primary">Update View</a>
+                        {% elif request.status == 'Accepted' %}
+                        <a href="#" class="btn btn-warning">Close</a>
+                        {% endif %}
+                        {% if request.status in ['Pending', 'Accepted'] %}
+                        <a href="#" class="btn btn-danger">Cancel</a>
+                        {% endif %}
+                        <br>
+                        <a href="#" class="btn btn-info">View Details</a>
+
+                    </td>
 
                 </tr>
                 {% endfor %}
