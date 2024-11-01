@@ -1,3 +1,4 @@
+from sqlalchemy.orm import validates
 from application.database import db
 from datetime import datetime
 
@@ -79,3 +80,25 @@ class ServiceRequest(db.Model):
         "ProfessionalDetails", back_populates="service_requests", lazy=True
     )
     user = db.relationship("User", back_populates="requested_services")
+
+    @validates("date_of_service")
+    def validate_date_of_service(self, key, date_of_service):
+        assert (
+            date_of_service > datetime.utcnow()
+        ), "Date of service should be in future"
+        return date_of_service
+
+    @validates("status")
+    def validate_status(self, key, status):
+        assert status in [
+            "Pending",
+            "Accepted",
+            "Rejected",
+            "Completed",
+        ], "Invalid Status"
+        return status
+
+    @validates("rating")
+    def validate_rating(self, key, rating):
+        assert rating in range(1, 6), "Rating should be between 1 and 5"
+        return rating
