@@ -99,14 +99,14 @@
                 </tr>
             </thead>
             <tbody>
-                {% for requests in service_requests %}
+                {% for request in service_requests %}
                 <tr>
-                    <td>{{ requests.id }}</td>
-                    <td>{{ requests.professional_details.username }}</td>
-                    <td>{{ requests.requested_date }}</td>
-                    <td>{{ requests.status }}</td>
+                    <td>{{ request.id }}</td>
+                    <td>{{ request.professional_details.username }}</td>
+                    <td>{{ request.requested_date }}</td>
+                    <td>{{ request.status }}</td>
                     <td>
-                        <a href="#">View</a>
+                        {% include 'components/view_review_modal.html' %}
                     </td>
                 </tr>
                 {% endfor %}

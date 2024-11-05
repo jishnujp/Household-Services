@@ -27,6 +27,9 @@
             <a href="{{ url_for('accept_service_request', id=service.id) }}" class="btn btn-success">Accept</a>
             <a href="{{ url_for('reject_service_request', id=service.id) }}" class="btn btn-danger">Reject</a>
             {% endif %}
+            {% if service.status == 'Accepted' %}
+            <a href="{{ url_for('close_service_request', id=service.id) }}" class="btn btn-success">Close</a>
+            {% endif %}
             <a href="#">View</a>
         </td>
     </tr>

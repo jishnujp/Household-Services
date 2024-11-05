@@ -371,6 +371,21 @@ def book_service(id):
         return render_template("customer/book.html", professional=professional)
 
 
+# submit_review
+@app.route("/customer/submit_review/<int:id>", methods=["POST"])
+@login_required("customer")
+def submit_review(id):
+    service_request = ServiceRequest.query.get(id)
+    service_request.review = request.form.get("review")
+    service_request.rating = int(request.form.get("rating"))
+    db.session.commit()
+    print(f"Review submitted for service request {id}")
+    print(f"Review: {service_request.review}")
+    print(f"Rating: {service_request.rating}")
+    flash("Review submitted successfully", "success")
+    return redirect(url_for("customer_home"))
+
+
 @app.route("/professional/home")
 @login_required("professional")
 def professional_home():
@@ -429,6 +444,17 @@ def reject_service_request(id):
     service_request.status = "Rejected"
     db.session.commit()
     flash("Service rejected", "success")
+    return redirect(url_for("professional_home"))
+
+
+# close the service request
+@app.route("/professional/close_service/<int:id>")
+@login_required("professional")
+def close_service_request(id):
+    service_request = ServiceRequest.query.get(id)
+    service_request.status = "Completed"
+    db.session.commit()
+    flash("Service completed", "success")
     return redirect(url_for("professional_home"))
 
 
