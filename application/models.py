@@ -81,12 +81,12 @@ class ServiceRequest(db.Model):
     )
     user = db.relationship("User", back_populates="requested_services")
 
-    @validates("date_of_service")
-    def validate_date_of_service(self, key, date_of_service):
-        assert (
-            date_of_service > datetime.utcnow()
-        ), "Date of service should be in future"
-        return date_of_service
+    # @validates("date_of_service")
+    # def validate_date_of_service(self, key, date_of_service):
+    #     assert (
+    #         date_of_service > datetime.utcnow()
+    #     ), "Date of service should be in future"
+    #     return date_of_service
 
     @validates("status")
     def validate_status(self, key, status):
