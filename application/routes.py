@@ -4,6 +4,7 @@ from application.models import *
 from functools import wraps
 from application.utils import hash_file_object
 from datetime import datetime
+from sqlalchemy import or_
 
 
 # login required decorator for admin, customer and professional
@@ -292,9 +293,74 @@ def delete_service(id):
     return redirect(url_for("admin_home"))
 
 
-@app.route("/admin/search")
+@app.route("/admin/search", methods=["GET", "POST"])
 @login_required("admin")
 def admin_search():
+    if request.method == "POST":
+        search_by = request.form.get("search_by")
+        search_query = request.form.get("search_query")
+        services, professionals, users = [], [], []
+        if search_by == "service":
+            services = Service.query.filter(
+                or_(
+                    Service.name.ilike(f"%{search_query}%"),
+                    Service.description.ilike(f"%{search_query}%"),
+                )
+            ).all()
+
+        elif search_by == "professional":
+            if search_query.isdigit():
+                professionals = (
+                    ProfessionalDetails.query.join(User)
+                    .filter(
+                        or_(
+                            User.phone.ilike(f"%{search_query}%"),
+                            User.pincode.ilike(f"%{search_query}%"),
+                        )
+                    )
+                    .all()
+                )
+            else:
+                professionals = (
+                    ProfessionalDetails.query.join(User)
+                    .filter(
+                        or_(
+                            ProfessionalDetails.username.ilike(f"%{search_query}%"),
+                            ProfessionalDetails.description.ilike(f"%{search_query}%"),
+                            User.full_name.ilike(f"%{search_query}%"),
+                            User.address.ilike(f"%{search_query}%"),
+                        )
+                    )
+                    .all()
+                )
+
+        elif search_by == "customer":
+            if search_query.isdigit():
+                users = User.query.filter(
+                    or_(
+                        User.phone.ilike(f"%{search_query}%"),
+                        User.pincode.ilike(f"%{search_query}%"),
+                    )
+                ).all()
+            else:
+                users = User.query.filter(
+                    or_(
+                        User.full_name.ilike(f"%{search_query}%"),
+                        User.username.ilike(f"%{search_query}%"),
+                    )
+                ).all()
+        else:
+            flash("Invalid search criteria", "danger")
+            return redirect(url_for("admin_search"))
+        if sum([len(services), len(professionals), len(users)]) == 0:
+            flash("No results found", "warning")
+            return redirect(url_for("admin_search"))
+        return render_template(
+            "admin/search.html",
+            services=services,
+            professionals=professionals,
+            users=users,
+        )
     return render_template("admin/search.html")
 
 

@@ -1,0 +1,40 @@
+<!-- Button to trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userDetailsModal-{{ user.id }}">
+    View
+</button>
+
+
+<!-- Modal -->
+<div class="modal fade" id="userDetailsModal-{{ user.id }}" tabindex="-1"
+    aria-labelledby="userDetailsModalLabel-{{ user.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userDetailsModalLabel-{{ user.id }}">User Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- user details content -->
+                <div class="container">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <img src="{{ url_for('static', filename= user.profile_pic) }}" class="img-fluid"
+                                alt="Profile Picture" max-height="200">
+                        </div>
+                        <div class="col-md-8">
+                            <h3>{{ user.full_name }}</h3>
+                            <p><strong>Username:</strong> {{ user.username }}</p>
+                            <p><strong>Address:</strong> {{ user.address }}</p>
+                            <p><strong>Pincode:</strong> {{ user.pincode }}</p>
+                            <p><strong>Phone:</strong> {{ user.phone }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
