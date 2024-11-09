@@ -1,0 +1,102 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#viewReviewModal{{ request.id }}">
+    view
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="viewReviewModal{{ request.id }}" tabindex="-1"
+    aria-labelledby="viewReviewModal{{ request.id }}Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="viewReviewModal{{ request.id }}Label">Service Details</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h3 class="fs-5">Service Details</h3>
+                <br>
+                <p><strong>Request ID: {{ request.id }}</strong></p>
+                <p><strong>Service Name: </strong>{{ request.professional_details.service_id }}</p>
+                <p><strong>Service Requirement: </strong>{{ request.remarks }}</p>
+                <p><strong>Date of Request: </strong>{{ request.date_of_request }}</p>
+                <p><strong>Date of Service: </strong>{{ request.date_of_service }}</p>
+                {% if session['role'] in ['admin', 'customer'] %}
+                <hr>
+                <h3 class="fs-5">Service Provider Details</h3>
+                <br>
+                <p><strong>Username: </strong>{{ request.professional_details.username }}</p>
+                <p><strong>Name: </strong>{{ request.professional_details.user.full_name }}</p>
+                <p><strong>Contact: </strong>{{ request.professional_details.user.phone }}</p>
+                {% endif %}
+                {% if session['role'] in ['admin', 'professional'] %}
+                <hr>
+                <h3 class="fs-5">Customer Details</h3>
+                <br>
+                <p><strong>Username: </strong>{{ request.user.username }}</p>
+                <p><strong>Name: </strong>{{ request.user.full_name }}</p>
+                <p><strong>Contact: </strong>{{ request.user.phone }}</p>
+                {% endif %}
+                <hr>
+                <p><strong>Service Status: </strong>{{ request.status }}</p>
+                {% if request.status == 'Completed' %}
+                <h3 class="fs-5">Review</h3>
+                <form action="{{ url_for('customer.submit_review', id=request.id) }}" method="POST">
+                    <!-- Review and rating form -->
+                    <div class="form-group">
+                        <label for="review">Review</label>
+                        <textarea name="review" class="form-control" id="review" rows="3" {% if session['role']
+                            !='customer' %} placeholder="-nil-" readonly {% else
+                            %}placeholder="Write your review here.." {%endif %}>{{ request.review }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="rating">
+                            {% if session['role'] =='customer' %}
+                            Rate the service:
+                            {% else %}
+                            Rating:
+                            {% endif %}
+                        </label>
+                        <div class="star-rating">
+                            {% for i in range(5, 0, -1) %}
+                            <input type="radio" name="rating" id="star{{ i }}" value="{{ i }}" {% if request.rating==i
+                                %} checked {% endif %} {% if session['role'] !='customer' %} disabled {% endif %}>
+                            <label for="star{{ i }}" class="bi bi-star-fill"></label>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                    {% if session['role'] =='customer' %}
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal"
+                        href="{{ url_for('customer.submit_review', id=request.id) }}">Save changes</button>
+                    {% endif %}
+                </form>
+                {% endif %}
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .star-rating {
+        direction: rtl;
+        display: inline-flex;
+    }
+
+    .star-rating input {
+        display: none;
+    }
+
+    .star-rating label {
+        font-size: 1.5rem;
+        color: #ddd;
+    }
+
+    .star-rating input:checked~label,
+    .star-rating label:hover,
+    .star-rating label:hover~label {
+        color: #ffc107;
+    }
+</style>

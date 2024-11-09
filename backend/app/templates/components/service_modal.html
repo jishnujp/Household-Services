@@ -1,0 +1,49 @@
+<!-- Button trigger modal -->
+{% if service %}
+{% set id_name = 'edit_' + service.name %}
+{% set url = url_for('admin.edit_service', id=service.id) %}
+{% else %}
+{% set id_name = 'add-service' %}
+{% set url = url_for('admin.add_service') %}
+{% endif %}
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#{{ id_name }}">
+    {% if service %}Edit{% else %}Add Service{% endif %}
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="{{ id_name }}" tabindex="-1" aria-labelledby="{{ id_name + '_label' }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5" id="{{ id_name + '_label' }}">
+                        {% if service %}Edit {{ service.name }}{% else %}Add Service{% endif %}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label for="service_name" class="form-label">Service Name</label>
+                        <input name="service_name" class="form-control" type="text" id="service_name"
+                            placeholder="Service Name" {% if service %}value="{{ service.name }}" {% endif %}>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="service_description" class="form-label">Service Description</label>
+                        <textarea name="service_description" class="form-control" id="service_description"
+                            placeholder="Service Description">{% if service %}{{ service.description }}{% endif %}</textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="base_price" class="form-label">Base Price</label>
+                        <input name="base_price" class="form-control" type="number" id="base_price"
+                            placeholder="Base Price" {% if service %}value="{{ service.base_price }}" {% endif %}>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
