@@ -1,22 +1,29 @@
 from app import db
+from app.models.base_model import BaseModel
 
 
-class ProfessionalDetails(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+class ProfessionalDetails(BaseModel):
+    id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        primary_key=True,
+        nullable=False,
+        autoincrement=False,
+    )
     service_id = db.Column(
         db.Integer, db.ForeignKey("service.id", ondelete="SET NULL"), nullable=True
     )
+    business_name = db.Column(db.String(50), nullable=False, unique=True)
     description = db.Column(db.String(100), nullable=False)
     experience = db.Column(db.Integer, nullable=False)
     document = db.Column(db.String(50), nullable=False)
     extra_price = db.Column(db.Integer, default=0)
     is_approved = db.Column(db.Boolean, default=False)
-    username = db.Column(db.String(20), db.ForeignKey("user.username"), nullable=False)
-    ## TODO: Add Service relationship,
-    ## TODO: Add Business name
+
+    service = db.relationship("Service", back_populates="professionals")
     user = db.relationship("User", back_populates="professional_details")
     service_requests = db.relationship(
-        "ServiceRequest", back_populates="professional_details", lazy=True
+        "ServiceRequest", back_populates="professional_details", lazy="select"
     )
 
     def block(self):

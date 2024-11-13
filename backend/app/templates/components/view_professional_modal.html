@@ -24,7 +24,8 @@
                                 class="img-fluid" alt="Profile Picture" max-height="200">
                         </div>
                         <div class="col-md-8">
-                            <h3>{{ professional.user.full_name }}</h3>
+                            <h3>{{ professional.business_name }}</h3>
+                            <p><strong>Name:</strong> {{ professional.user.full_name }}</p>
                             <p><strong>Username:</strong> {{ professional.user.username }}</p>
                             <p><strong>Address:</strong> {{ professional.user.address }}</p>
                             <p><strong>Pincode:</strong> {{ professional.user.pincode }}</p>
@@ -36,7 +37,7 @@
 
                     <!-- Professional service details -->
                     <h4>Service Details</h4>
-                    <p><strong>Service ID:</strong> {{ professional.service_id }}</p>
+                    <p><strong>Service:</strong> {{ professional.service.name }}</p>
                     <p><strong>Description:</strong> {{ professional.description }}</p>
                     <p><strong>Experience (years):</strong> {{ professional.experience }}</p>
                     <p><strong>Document:</strong> <a

@@ -5,4 +5,4 @@ venv/
 .env
 
 
-static/storage/*
+backend/app/static/uploads/*

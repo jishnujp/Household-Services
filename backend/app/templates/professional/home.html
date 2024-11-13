@@ -16,24 +16,24 @@
             <th>Actions</th>
         </tr>
     </thead>
-    {% for service in todays_services %}
+    {% for request in todays_services %}
     <tr>
-        <td>{{ service.id }}</td>
-        <td>{{ service.user.full_name }}</td>
-        <td>{{ service.user.phone }}</td>
-        <td>{{ service.user.address }} <br>Pincode: {{ service.user.pincode }} </td>
+        <td>{{ request.id }}</td>
+        <td>{{ request.user.full_name }}</td>
+        <td>{{ request.user.phone }}</td>
+        <td>{{ request.user.address }} <br>Pincode: {{ request.user.pincode }} </td>
         <td>
-            {% if service.status == 'Pending' %}
-            <a href="{{ url_for('professional.accept_service_request', id=service.id) }}"
+            {% if request.status == 'Pending' %}
+            <a href="{{ url_for('professional.accept_service_request', id=request.id) }}"
                 class="btn btn-success">Accept</a>
-            <a href="{{ url_for('professional.reject_service_request', id=service.id) }}"
+            <a href="{{ url_for('professional.reject_service_request', id=request.id) }}"
                 class="btn btn-danger">Reject</a>
             {% endif %}
-            {% if service.status == 'Accepted' %}
-            <a href="{{ url_for('professional.close_service_request', id=service.id) }}"
+            {% if request.status == 'Accepted' %}
+            <a href="{{ url_for('professional.close_service_request', id=request.id) }}"
                 class="btn btn-success">Close</a>
             {% endif %}
-            <a href="#">View</a>
+            {% include 'components/view_review_modal.html' %}
         </td>
     </tr>
     {% endfor %}
@@ -50,20 +50,20 @@
             <th>Actions</th>
         </tr>
     </thead>
-    {% for service in upcoming_services %}
+    {% for request in upcoming_services %}
     <tr>
-        <td>{{ service.id }}</td>
-        <td>{{ service.user.full_name }}</td>
-        <td>{{ service.user.phone }}</td>
-        <td>{{ service.user.address }} <br>Pincode: {{ service.user.pincode }} </td>
+        <td>{{ request.id }}</td>
+        <td>{{ request.user.full_name }}</td>
+        <td>{{ request.user.phone }}</td>
+        <td>{{ request.user.address }} <br>Pincode: {{ request.user.pincode }} </td>
         <td>
-            {% if service.status == 'Pending' %}
-            <a href="{{ url_for('professional.accept_service_request', id=service.id) }}"
+            {% if request.status == 'Pending' %}
+            <a href="{{ url_for('professional.accept_service_request', id=request.id) }}"
                 class="btn btn-success">Accept</a>
-            <a href="{{ url_for('professional.reject_service_request', id=service.id) }}"
+            <a href="{{ url_for('professional.reject_service_request', id=request.id) }}"
                 class="btn btn-danger">Reject</a>
             {% endif %}
-            <a href="#">View</a>
+            {% include 'components/view_review_modal.html' %}
         </td>
     </tr>
     {% endfor %}

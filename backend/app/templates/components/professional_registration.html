@@ -1,15 +1,34 @@
 <!-- Service  -->
 
-<div class="form-group">
-    <label for="service">Service</label>
-    <select class="form-control" id="service" name="service" ng-model="professional.service"
-        ng-options="service as service.name for service in available_services" required>
-        <option value="">Select a service</option>
+<div class="form-group mb-3">
+    <label for="service" class="form-label">Service</label>
+    <select class="form-control" id="service" name="service" required onchange="updateBasePrice()">
+        <option value="" data-base-price="0">Select a service</option>
         {% for service in available_services %}
-        <option value="{{ service.id }}">{{ service.name }}</option>
+        <option value="{{ service.id }}" data-base-price="{{ service.base_price }}">{{ service.name }}</option>
         {% endfor %}
     </select>
 </div>
+
+<!-- Display the base price of the selected service -->
+<div class="form-group mb-3">
+    <label for="base_price" class="form-label">Base Price (per hour)</label>
+    <input type="number" class="form-control" id="base_price" readonly>
+</div>
+
+<!-- Extra price -->
+<div class="form-group mb-3">
+    <label for="extra_price" class="form-label">Extra Price</label>
+    <input name="extra_price" class="form-control" type="number" id="extra_price"
+        placeholder="Extra price that you charge above base price" default=0>
+</div>
+<!-- business_name -->
+<div class="form-group mb-3">
+    <label for="business_name" class="form-label">Business Name</label>
+    <input name="business_name" class="form-control" type="text" id="business_name" placeholder="Name of your business"
+        required>
+</div>
+
 <!-- Description -->
 <div class="form-group mb-3">
     <label for="desc" class="form-label">Description</label>
@@ -29,3 +48,12 @@
     <label for="experience_doc" class="form-label">Experience Document</label>
     <input name="experience_doc" class="form-control" type="file" id="experience_doc" accept="application/pdf" required>
 </div>
+
+<script>
+    function updateBasePrice() {
+        const serviceDropdown = document.getElementById("service");
+        const selectedOption = serviceDropdown.options[serviceDropdown.selectedIndex];
+        const basePrice = selectedOption.getAttribute("data-base-price");
+        document.getElementById("base_price").value = basePrice || 0;
+    }
+</script>

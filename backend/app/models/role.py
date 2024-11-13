@@ -1,32 +1,28 @@
 from app import db
-from sqlalchemy.orm import validates
-
-ALLOWED_ROLES = ["admin", "customer", "professional"]
+from sqlalchemy import Enum
+from app.utils.constants import AllowableRoles
 
 
 class Role(db.Model):
-    # admin, customer, professional
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False, unique=True)
-
-    @validates("name")
-    def validate_name(self, key, name):
-        if not name:
-            raise AssertionError("Role name is required.")
-        if name != name.lower():
-            raise AssertionError("Role name must be in lowercase.")
-        if name not in ALLOWED_ROLES:
-            raise AssertionError(f"Role name must be one of {ALLOWED_ROLES}")
-        return name
+    name = db.Column(
+        Enum(*AllowableRoles.all(), name="allowable_roles_enum"),
+        nullable=False,
+        unique=True,
+    )
+    users = db.relationship(
+        "User", secondary="user_role", back_populates="roles", lazy="select"
+    )
 
     @classmethod
     def create_default_roles(cls):
-        """Create default roles and an admin user if they do not exist."""
+        """Create default roles if they do not exist."""
+        existing_roles = {role.name for role in cls.query.all()}
+        missing_roles = set(AllowableRoles.all()) - existing_roles
 
-        for role_name in ALLOWED_ROLES:
-            role = cls.query.filter_by(name=role_name).first()
-            if not role:
-                role = cls(name=role_name)
-                db.session.add(role)
+        if missing_roles:
+            db.session.add_all([cls(name=role_name) for role_name in missing_roles])
+            db.session.commit()
 
-        db.session.commit()
+    def __repr__(self):
+        return f"<Role {self.id}: {self.name}>"

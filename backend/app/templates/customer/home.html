@@ -60,7 +60,7 @@
                 <tbody>
                     {% for professional in professionals %}
                     <tr>
-                        <td>{{ professional.username }}</td>
+                        <td>{{ professional.user.username }}</td>
                         <td><img src="{{ url_for('public.uploaded_image', filename=professional.user.profile_pic) }}"
                                 alt="{{ professional.name }}" width="100" height="100"></td>
                         <td>{{ professional.experience }}</td>

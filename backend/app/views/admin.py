@@ -149,8 +149,11 @@ def search():
                     ProfessionalDetails.query.join(User)
                     .filter(
                         or_(
-                            ProfessionalDetails.username.ilike(f"%{search_query}%"),
+                            User.username.ilike(f"%{search_query}%"),
                             ProfessionalDetails.description.ilike(f"%{search_query}%"),
+                            ProfessionalDetails.business_name.ilike(
+                                f"%{search_query}%"
+                            ),
                             User.full_name.ilike(f"%{search_query}%"),
                             User.address.ilike(f"%{search_query}%"),
                         )

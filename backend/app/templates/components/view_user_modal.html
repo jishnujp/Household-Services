@@ -19,8 +19,8 @@
                 <div class="container">
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <img src="{{ url_for('static', filename= user.profile_pic) }}" class="img-fluid"
-                                alt="Profile Picture" max-height="200">
+                            <img src="{{ url_for('public.uploaded_image', filename= user.profile_pic) }}"
+                                class="img-fluid" alt="Profile Picture" max-height="200">
                         </div>
                         <div class="col-md-8">
                             <h3>{{ user.full_name }}</h3>

@@ -10,9 +10,9 @@ from flask import (
     current_app as app,
 )
 import os
-from app.models import User, Role, ProfessionalDetails, Service
+from app.models import User, Service
 from app.utils import login_required
-from app.services.user_professional_services import (
+from app.controllers import (
     create_customer,
     create_professional,
 )

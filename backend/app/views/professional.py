@@ -27,9 +27,9 @@ def home():
     today = datetime.now()
     for service in service_requests:
         # compare only date, not time
-        if service.date_of_service.date() == today.date():
+        if service.date_of_service == today.date():
             todays_services.append(service)
-        elif service.date_of_service.date() > today.date():
+        elif service.date_of_service > today.date():
             upcoming_services.append(service)
     completed_services = [
         service for service in service_requests if service.status == "Completed"

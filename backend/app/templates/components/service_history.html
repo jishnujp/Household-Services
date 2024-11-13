@@ -18,9 +18,8 @@
                 {% for request in request_history %}
                 <tr>
                     <td>{{ request.id }}</td>
-                    <td>{{ request.date_of_service.date() }}</td>
-                    <td>--</td>
-                    <!-- <td>{{ request.professional_details.service }}</td> -->
+                    <td>{{ request.date_of_service }}</td>
+                    <td>{{ request.professional_details.service.name }}</td>
                     <td>
                         {{ request.professional_details.user.full_name }}
                         <br>

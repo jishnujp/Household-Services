@@ -68,7 +68,7 @@ customer_role = Role.query.filter_by(name="customer").first()
 users = [
     {
         "username": "zeus@gmail.com",
-        "password": "zeus123",
+        "password": "Zeus123",
         "full_name": "Zeus God of Thunder",
         "address": "Mount Olympus",
         "pincode": "123456",
@@ -77,6 +77,7 @@ users = [
         "profile_pic": "https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://fdczvxmwwjwpwbeeqcth.supabase.co/storage/v1/object/public/images/f9ecfab6-a4f7-4ef6-b15f-ef7c082577ab/922fd7c0-e944-4f22-85e5-cfaed6ed27f8.png",
         "professional_details": {
             "service_id": Service.query.filter_by(name="Wiring").first().id,
+            "business_name": "Zeus Electricals",
             "description": "Master electrician with 10 years of experience in residential and commercial electrical work",
             "experience": 10,
             "document": "https://mi01000971.schoolwires.net/cms/lib/MI01000971/Centricity/Domain/2059/Greek%20God%20Pantheon.pdf",
@@ -86,7 +87,7 @@ users = [
     },
     {
         "username": "davinci@gmail.com",
-        "password": "davinci123",
+        "password": "Davinci123",
         "full_name": "Leonardo da Vinci",
         "address": "Florence, Italy",
         "pincode": "543210",
@@ -95,6 +96,7 @@ users = [
         "profile_pic": "https://images.theconversation.com/files/517874/original/file-20230328-368-uasp13.jpg?ixlib=rb-4.1.0&rect=0%2C0%2C3623%2C2742&q=45&auto=format&w=926&fit=clip",
         "professional_details": {
             "service_id": Service.query.filter_by(name="Painting").first().id,
+            "business_name": "Da Vinci Paints",
             "description": "Renowned artist and painter with expertise in creating masterpieces on canvas and walls",
             "experience": 20,
             "document": "https://cavitt.eurekausd.org/documents/Parents/PTC/Art%20Docent%20Presentations/7th%20Grade/7th%20Gr%20T3%20-%20Italian%20Renaissance%20%20Classroom%20Presentation.pdf",
@@ -104,7 +106,7 @@ users = [
     },
     {
         "username": "carlsen@gmail.com",
-        "password": "carlsen123",
+        "password": "Carlsen123",
         "full_name": "Magnus Carlsen",
         "address": "Oslo, Norway",
         "pincode": "987654",
@@ -141,6 +143,7 @@ for user in users:
         profile_pic=user["profile_pic"],
     )
     db.session.add(new_user)
+    db.session.commit()
     # download the pdf and save it in the folder static/storage/documents
     if not user["professional_details"]:
         continue
@@ -153,13 +156,14 @@ for user in users:
 
     if professional_role in user["roles"]:
         professional_details = ProfessionalDetails(
+            id=new_user.id,
             service_id=user["professional_details"]["service_id"],
+            business_name=user["professional_details"]["business_name"],
             description=user["professional_details"]["description"],
             experience=user["professional_details"]["experience"],
             document=user["professional_details"]["document"],
             extra_price=user["professional_details"]["extra_price"],
             is_approved=user["professional_details"]["is_approved"],
-            username=user["username"],
         )
         db.session.add(professional_details)
 

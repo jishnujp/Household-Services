@@ -1,25 +1,27 @@
-from app import db
 from sqlalchemy.orm import validates
+import os
+from app import db
+from app.models.base_model import BaseModel
 
 
-class User(db.Model):
+class User(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False, index=True)
     password = db.Column(db.String(60), nullable=False)
     full_name = db.Column(db.String(100))
     address = db.Column(db.String(100))
-    profile_pic = db.Column(db.String(20), default="default.jpg")
+    profile_pic = db.Column(db.String(20), default="default_profile.jpg")
     pincode = db.Column(db.String(6))
     phone = db.Column(db.String(15))
 
     roles = db.relationship(
-        "Role", secondary="user_role", backref=db.backref("users", lazy=True)
+        "Role", secondary="user_role", back_populates="users", lazy="select"
     )
     professional_details = db.relationship(
-        "ProfessionalDetails", back_populates="user", lazy=True, uselist=False
+        "ProfessionalDetails", back_populates="user", uselist=False, lazy="select"
     )
     requested_services = db.relationship(
-        "ServiceRequest", back_populates="user", lazy=True
+        "ServiceRequest", back_populates="user", lazy="select"
     )
 
     @classmethod
@@ -36,8 +38,8 @@ class User(db.Model):
 
         if not User.query.filter_by(username="admin@admin").first():
             admin_user = User(
-                username="admin@admin",
-                password="admin",
+                username=os.getenv("ADMIN_USERNAME", "admin@admin"),
+                password=os.getenv("ADMIN_PASSWORD", "Admin123"),
                 roles=[admin_role, professional_role],
             )
             db.session.add(admin_user)
@@ -57,4 +59,14 @@ class User(db.Model):
             raise AssertionError("Password is required.")
         if len(password) < 5 or len(password) > 20:
             raise AssertionError("Password must be between 5 and 20 characters.")
+        # check strength of password
+        if not any(char.isdigit() for char in password):
+            raise AssertionError("Password must have at least one digit.")
+        if not any(char.isupper() for char in password):
+            raise AssertionError("Password must have at least one uppercase letter.")
+        if not any(char.islower() for char in password):
+            raise AssertionError("Password must have at least one lowercase letter.")
         return password
+
+    def __repr__(self):
+        return f"<User {self.id}: {self.username}>"
