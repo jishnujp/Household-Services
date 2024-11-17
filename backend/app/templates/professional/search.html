@@ -3,5 +3,90 @@
 {% block title %}Search{% endblock %}
 
 {% block content %}
-search Page for Professional
+<div class="container">
+    <h1 class="text-center">Search</h1>
+    <form action="{{ url_for('professional.search') }}" method="POST">
+        <div class="container">
+            <!-- Row for Label -->
+            <div class="row mb-2">
+                <div class="col-md-2 col-12 mb-2 mb-md-0">
+                    <strong>Search by :</strong>
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-2 col-12 mb-2 mb-md-0">
+                    <select id="search_by" name="search_by" class="form-select" onchange="updateInputType()">
+                        <option value="date">Date</option>
+                        <option value="user" selected>Customer</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 col-12 mb-2 mb-md-0">
+                    <input type="text" id="search_query" name="search_query" class="form-control" placeholder="Search">
+                </div>
+
+                <div class="col-md-2 col-12">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<br>
+<div>
+    {% if service_requests %}
+
+    <!-- table to display the requests -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Requested date</th>
+                <th>Service Date</th>
+                <th>Cutomer</th>
+                <th>Status</th>
+                <th>View</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in service_requests %}
+            <tr>
+                <td>{{ request.id }}</td>
+                <td>{{ request.created_at.date() }}</td>
+                <td>{{ request.date_of_service }}</td>
+                <td>{{ request.user.username }}
+                    {% set user = request.user %}
+                    {% include 'components/view_user_modal.html' %}
+                </td>
+                <td>{{ request.status }}</td>
+                <td>
+                    {% include 'components/view_review_modal.html' %}
+                </td>
+            </tr>
+        </tbody>
+
+        {% endfor %}
+
+        {% endif %}
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    function updateInputType() {
+        const searchBy = document.getElementById('search_by').value;
+        const searchQuery = document.getElementById('search_query');
+
+        console.log(searchQuery);
+        if (searchBy === 'date') {
+            searchQuery.type = 'date';
+            searchQuery.placeholder = '';
+        } else {
+            searchQuery.type = 'text';
+            searchQuery.placeholder = 'Search';
+        }
+    }
+</script>
 {% endblock %}

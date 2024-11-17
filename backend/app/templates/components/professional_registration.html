@@ -49,6 +49,7 @@
     <input name="experience_doc" class="form-control" type="file" id="experience_doc" accept="application/pdf" required>
 </div>
 
+{% block script %}
 <script>
     function updateBasePrice() {
         const serviceDropdown = document.getElementById("service");
@@ -57,3 +58,4 @@
         document.getElementById("base_price").value = basePrice || 0;
     }
 </script>
+{% endblock %}

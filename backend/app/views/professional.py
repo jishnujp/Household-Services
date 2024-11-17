@@ -1,12 +1,6 @@
-from flask import (
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    session,
-    Blueprint,
-)
+from flask import render_template, redirect, url_for, flash, session, Blueprint, request
 from datetime import datetime
+from sqlalchemy import or_
 from app.models import User, ServiceRequest
 from app.utils import login_required
 from app import db
@@ -43,9 +37,39 @@ def home():
     )
 
 
-@professional_view_bp.route("/search")
+@professional_view_bp.route("/search", methods=["GET", "POST"])
 @login_required("professional")
 def search():
+    if request.method == "POST":
+        search_query = request.form["search_query"]
+        search_by = request.form["search_by"]
+        if search_by == "date":
+            service_requests = ServiceRequest.query.filter_by(
+                date_of_service=search_query
+            ).all()
+        elif search_by == "user":
+            service_requests = (
+                ServiceRequest.query.join(User)
+                .filter(
+                    or_(
+                        User.address.like(f"%{search_query}%"),
+                        User.full_name.like(f"%{search_query}%"),
+                        User.username.like(f"%{search_query}%"),
+                        User.phone.like(f"%{search_query}%"),
+                        User.pincode.like(f"%{search_query}%"),
+                    )
+                )
+                .all()
+            )
+
+        else:
+            flash("Invalid search criteria", "danger")
+            return redirect(url_for("professional.search"))
+
+        return render_template(
+            "professional/search.html", service_requests=service_requests
+        )
+
     return render_template("professional/search.html")
 
 
