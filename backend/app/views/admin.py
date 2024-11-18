@@ -7,6 +7,8 @@ from flask import (
     Blueprint,
 )
 from sqlalchemy import or_
+import plotly.express as px
+import plotly.io as pio
 from app.models import User, ProfessionalDetails, Service, ServiceRequest, Role
 from app.utils import login_required
 from app import db
@@ -196,4 +198,39 @@ def search():
 @admin_view_bp.route("/summary")
 @login_required("admin")
 def summary():
-    return render_template("admin/summary.html")
+    # get all the customer ratings
+    customer_ratings = {i: 0 for i in range(6)}
+    all_service_requests = ServiceRequest.query.all()
+    for service_request in all_service_requests:
+        if service_request.rating:
+            customer_ratings[service_request.rating] += 1
+        else:
+            customer_ratings[0] += 1
+    rating_fig = px.bar(
+        x=list(customer_ratings.keys()),
+        y=list(customer_ratings.values()),
+        title="Customer Ratings",
+        labels={"x": "Rating", "y": "Count"},
+    )
+
+    # get the status of all service requests and plot a pie chart
+    status_count = {}
+    for service_request in all_service_requests:
+        if service_request.status not in status_count:
+            status_count[service_request.status] = 1
+        else:
+            status_count[service_request.status] += 1
+    status_fig = px.pie(
+        values=list(status_count.values()),
+        names=list(status_count.keys()),
+        title="Service Request Status",
+    )
+
+    # get html of the plots
+    rating_plot_html = pio.to_html(rating_fig, full_html=False)
+    status_plot_html = pio.to_html(status_fig, full_html=False)
+    return render_template(
+        "admin/summary.html",
+        rating_plot_html=rating_plot_html,
+        status_plot_html=status_plot_html,
+    )

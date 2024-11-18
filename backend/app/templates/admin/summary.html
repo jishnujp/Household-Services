@@ -3,7 +3,8 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-
-Summary page
-
+<h2>Service Ratings</h2>
+{{ rating_plot_html|safe }}
+<h2>Services status</h2>
+{{ status_plot_html|safe }}
 {% endblock %}

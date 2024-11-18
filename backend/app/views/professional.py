@@ -1,7 +1,9 @@
 from flask import render_template, redirect, url_for, flash, session, Blueprint, request
 from datetime import datetime
 from sqlalchemy import or_
-from app.models import User, ServiceRequest
+import plotly.express as px
+import plotly.io as pio
+from app.models import User, ServiceRequest, ProfessionalDetails
 from app.utils import login_required
 from app import db
 
@@ -76,7 +78,23 @@ def search():
 @professional_view_bp.route("/summary")
 @login_required("professional")
 def summary():
-    return render_template("professional/summary.html")
+    customer_ratings = {i: 0 for i in range(6)}
+    all_service_requests = ServiceRequest.query.filter_by(
+        professional_details_id=session["user"]
+    )
+    for service_request in all_service_requests:
+        if service_request.rating:
+            customer_ratings[service_request.rating] += 1
+        else:
+            customer_ratings[0] += 1
+    rating_fig = px.bar(
+        x=list(customer_ratings.keys()),
+        y=list(customer_ratings.values()),
+        title="Customer Ratings",
+        labels={"x": "Rating", "y": "Count"},
+    )
+    rating_fig = pio.to_html(rating_fig)
+    return render_template("professional/summary.html", rating_fig=rating_fig)
 
 
 @professional_view_bp.route("/accept_service/<int:id>")

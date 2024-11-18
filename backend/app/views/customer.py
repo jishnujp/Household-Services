@@ -8,6 +8,9 @@ from flask import (
     Blueprint,
 )
 from datetime import datetime
+from sqlalchemy import or_
+import plotly.express as px
+import plotly.io as pio
 from app.models import User, ProfessionalDetails, Service, ServiceRequest
 from app.utils import login_required
 from app import db
@@ -43,16 +46,73 @@ def home():
     )
 
 
-@customer_view_bp.route("/search")
+@customer_view_bp.route("/search", methods=["GET", "POST"])
 @login_required("customer")
 def search():
-    return render_template("customer/search.html")
+    if request.method == "POST":
+        search_query = request.form.get("search_query")
+        search_by = request.form.get("search_by")
+        professionals = []
+        if search_by == "service":
+            services = Service.query.filter(
+                Service.name.ilike(f"%{search_query}%")
+            ).all()
+            professionals = [
+                professional
+                for service in services
+                for professional in service.professionals
+                if professional.is_approved
+            ]
+        elif search_by == "professional":
+            professionals = (
+                ProfessionalDetails.query.join(User)
+                .filter(
+                    or_(
+                        User.username.ilike(f"%{search_query}%"),
+                        ProfessionalDetails.business_name.ilike(f"%{search_query}%"),
+                        User.full_name.ilike(f"%{search_query}%"),
+                    )
+                )
+                .all()
+            )
+        elif search_by == "pincode":
+            professionals = (
+                ProfessionalDetails.query.join(User)
+                .filter(User.pincode.ilike(f"%{search_query}%"))
+                .all()
+            )
+        else:
+            flash("Invalid search criteria", "danger")
+            return redirect(url_for("customer.home"))
+        return render_template("customer/search.html", professionals=professionals)
+    else:
+        return render_template("customer/search.html")
 
 
 @customer_view_bp.route("/summary")
 @login_required("customer")
 def summary():
-    return render_template("customer/summary.html")
+    all_service_requests = ServiceRequest.query.filter_by(
+        customer_id=session["user"]
+    ).all()
+
+    status_count = {}
+    for service_request in all_service_requests:
+        if service_request.status not in status_count:
+            status_count[service_request.status] = 1
+        else:
+            status_count[service_request.status] += 1
+    status_fig = px.pie(
+        values=list(status_count.values()),
+        names=list(status_count.keys()),
+        title="Service Request Status",
+    )
+
+    status_plot_html = pio.to_html(status_fig, full_html=False)
+    return render_template(
+        "customer/summary.html",
+        status_plot_html=status_plot_html,
+    )
 
 
 @customer_view_bp.route("/book/<int:id>", methods=["GET", "POST"])

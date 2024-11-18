@@ -3,5 +3,71 @@
 {% block title %}Search{% endblock %}
 
 {% block content %}
-Search Page for Customer
+<div class="container">
+    <h1 class="text-center">Search</h1>
+    <form action="{{ url_for('customer.search') }}" method="POST">
+        <div class="container">
+            <!-- Row for Label -->
+            <div class="row mb-2">
+                <div class="col-md-2 col-12 mb-2 mb-md-0">
+                    <strong>Search by :</strong>
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-2 col-12 mb-2 mb-md-0">
+                    <select id="search_by" name="search_by" class="form-select" onchange="updateInputType()">
+                        <option value="service">Service Name</option>
+                        <option value="professional" selected>Professional Name</option>
+                        <option value="pincode" selected>Pincode</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 col-12 mb-2 mb-md-0">
+                    <input type="text" id="search_query" name="search_query" class="form-control" placeholder="Search">
+                </div>
+
+                <div class="col-md-2 col-12">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<br>
+<div>
+    {% if professionals %}
+
+    <div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Profile</th>
+                    <th>Experience</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for professional in professionals %}
+                <tr>
+                    <td>{{ professional.user.username }}</td>
+                    <td><img src="{{ url_for('public.uploaded_image', filename=professional.user.profile_pic) }}"
+                            alt="{{ professional.name }}" width="100" height="100"></td>
+                    <td>{{ professional.experience }}</td>
+                    <td>
+                        <a href="{{ url_for('customer.book_service', id=professional.id) }}"
+                            class="btn btn-success">Book
+                            Service</a>
+
+                        {% include 'components/view_professional_modal.html' %}
+
+                    </td>
+                </tr>
+                {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}
