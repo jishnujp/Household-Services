@@ -6,12 +6,17 @@ from flask import (
     flash,
     Blueprint,
 )
-from sqlalchemy import or_
 import plotly.express as px
 import plotly.io as pio
-from app.models import User, ProfessionalDetails, Service, ServiceRequest, Role
+from app.models import Service, Role
 from app.utils import login_required
 from app import db
+from app.controllers import (
+    search_professional,
+    search_user,
+    search_service,
+    search_service_requests,
+)
 
 admin_view_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -22,8 +27,8 @@ def home():
     return render_template(
         "admin/home.html",
         services=Service.query.filter(Service.name != "NoService").all(),
-        professionals=ProfessionalDetails.query.all(),
-        service_requests=ServiceRequest.query.all(),
+        professionals=search_professional(),
+        service_requests=search_service_requests(),
     )
 
 
@@ -46,7 +51,7 @@ def add_service():
 @admin_view_bp.route("/approve_professional/<int:id>")
 @login_required("admin")
 def approve_professional(id):
-    professional = ProfessionalDetails.query.get(id)
+    professional = search_professional(id=id)
     professional.is_approved = True
     db.session.commit()
     flash("Professional approved", "success")
@@ -56,7 +61,7 @@ def approve_professional(id):
 @admin_view_bp.route("/block_professional/<int:id>")
 @login_required("admin")
 def block_professional(id):
-    professional = ProfessionalDetails.query.get(id)
+    professional = search_professional(id=id)
     professional.is_approved = False
     db.session.add(professional)
     db.session.commit()
@@ -67,14 +72,14 @@ def block_professional(id):
 @admin_view_bp.route("/view_professional/<int:id>")
 @login_required("admin")
 def view_professional(id):
-    professional = ProfessionalDetails.query.get(id)
+    professional = search_professional(id=id)
     return render_template("admin/view_professional.html", professional=professional)
 
 
 @admin_view_bp.route("/edit_service/<int:id>", methods=["GET", "POST"])
 @login_required("admin")
 def edit_service(id):
-    service = Service.query.get(id)
+    service = search_service(id=id)
     if request.method == "POST":
         new_name = request.form.get("service_name")
         new_desc = request.form.get("service_description")
@@ -96,7 +101,7 @@ def edit_service(id):
 @admin_view_bp.route("/delete_service/<int:id>", methods=["POST"])
 @login_required("admin")
 def delete_service(id):
-    service = Service.query.get(id)
+    service = search_service(id=id)
     if not service:
         flash("Service not found.", "error")
         return redirect(url_for("admin.home"))
@@ -127,57 +132,33 @@ def search():
         search_query = request.form.get("search_query")
         services, professionals, users = [], [], []
         if search_by == "service":
-            services = Service.query.filter(
-                or_(
-                    Service.name.ilike(f"%{search_query}%"),
-                    Service.description.ilike(f"%{search_query}%"),
-                )
-            ).all()
+            services = search_service(
+                name__like=search_query, description__like=search_query
+            )
 
         elif search_by == "professional":
             if search_query.isdigit():
-                professionals = (
-                    ProfessionalDetails.query.join(User)
-                    .filter(
-                        or_(
-                            User.phone.ilike(f"%{search_query}%"),
-                            User.pincode.ilike(f"%{search_query}%"),
-                        )
-                    )
-                    .all()
+                professionals = search_professional(
+                    phone__like=search_query, pincode__like=search_query
                 )
             else:
-                professionals = (
-                    ProfessionalDetails.query.join(User)
-                    .filter(
-                        or_(
-                            User.username.ilike(f"%{search_query}%"),
-                            ProfessionalDetails.description.ilike(f"%{search_query}%"),
-                            ProfessionalDetails.business_name.ilike(
-                                f"%{search_query}%"
-                            ),
-                            User.full_name.ilike(f"%{search_query}%"),
-                            User.address.ilike(f"%{search_query}%"),
-                        )
-                    )
-                    .all()
+                professionals = search_professional(
+                    username__like=search_query,
+                    business_name__like=search_query,
+                    description__like=search_query,
+                    full_name__like=search_query,
+                    address__like=search_query,
                 )
 
         elif search_by == "customer":
             if search_query.isdigit():
-                users = User.query.filter(
-                    or_(
-                        User.phone.ilike(f"%{search_query}%"),
-                        User.pincode.ilike(f"%{search_query}%"),
-                    )
-                ).all()
+                users = search_user(
+                    phone__like=search_query, pincode__like=search_query
+                )
             else:
-                users = User.query.filter(
-                    or_(
-                        User.full_name.ilike(f"%{search_query}%"),
-                        User.username.ilike(f"%{search_query}%"),
-                    )
-                ).all()
+                users = search_user(
+                    username__like=search_query, full_name__like=search_query
+                )
             admin_role = Role.query.filter_by(name="admin").first()
             users = [user for user in users if admin_role not in user.roles]
         else:
@@ -200,7 +181,7 @@ def search():
 def summary():
     # get all the customer ratings
     customer_ratings = {i: 0 for i in range(6)}
-    all_service_requests = ServiceRequest.query.all()
+    all_service_requests = search_service_requests()
     for service_request in all_service_requests:
         if service_request.rating:
             customer_ratings[service_request.rating] += 1

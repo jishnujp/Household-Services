@@ -27,7 +27,7 @@ def login_required(role=None):
 
             user_id = session["user"]
 
-            user_permissions = [urole.name for urole in User.query.get(user_id).roles]
+            user_permissions = [urole.name for urole in User.get_user(user_id).roles]
             if role and role not in user_permissions:
                 abort(403)
 

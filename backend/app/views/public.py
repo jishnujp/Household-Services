@@ -10,11 +10,12 @@ from flask import (
     current_app as app,
 )
 import os
-from app.models import User, Service
+from app.models import User
 from app.utils import login_required
 from app.controllers import (
     create_customer,
     create_professional,
+    search_service,
 )
 
 
@@ -37,7 +38,7 @@ def login():
             messages.append("Username is required")
         if not password:
             messages.append("Password is required")
-        user = User.query.filter_by(username=username).first()
+        user = User.get_user(username)
         if not user:
             messages.append("User not found")
         elif user and user.password != password:
@@ -117,7 +118,7 @@ def register(role):
 
     elif request.method == "GET":
         if role == "professional":
-            services = Service.query.all()
+            services = search_service()
             return render_template(
                 "register.html", role=role, available_services=services
             )

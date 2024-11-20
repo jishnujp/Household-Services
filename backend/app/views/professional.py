@@ -1,11 +1,11 @@
 from flask import render_template, redirect, url_for, flash, session, Blueprint, request
 from datetime import datetime
-from sqlalchemy import or_
 import plotly.express as px
 import plotly.io as pio
-from app.models import User, ServiceRequest, ProfessionalDetails
+from app.models import User
 from app.utils import login_required
 from app import db
+from app.controllers import search_service_requests
 
 professional_view_bp = Blueprint("professional", __name__, url_prefix="/professional")
 
@@ -14,10 +14,8 @@ professional_view_bp = Blueprint("professional", __name__, url_prefix="/professi
 @login_required("professional")
 def home():
     print(session["user"])
-    professional = User.query.get(session["user"]).professional_details
-    service_requests = ServiceRequest.query.filter_by(
-        professional_details_id=professional.id
-    ).all()
+    professional = User.get_user(session["user"]).professional_details
+    service_requests = search_service_requests(professional_details_id=professional.id)
     todays_services, upcoming_services = [], []
     # todays date
     today = datetime.now()
@@ -46,22 +44,15 @@ def search():
         search_query = request.form["search_query"]
         search_by = request.form["search_by"]
         if search_by == "date":
-            service_requests = ServiceRequest.query.filter_by(
-                date_of_service=search_query
-            ).all()
+            service_requests = search_service_requests(date_of_service=search_query)
         elif search_by == "user":
-            service_requests = (
-                ServiceRequest.query.join(User)
-                .filter(
-                    or_(
-                        User.address.like(f"%{search_query}%"),
-                        User.full_name.like(f"%{search_query}%"),
-                        User.username.like(f"%{search_query}%"),
-                        User.phone.like(f"%{search_query}%"),
-                        User.pincode.like(f"%{search_query}%"),
-                    )
-                )
-                .all()
+            service_requests = search_service_requests(
+                by="customer",
+                address__like=search_query,
+                full_name__like=search_query,
+                username__like=search_query,
+                phone__like=search_query,
+                pincode__like=search_query,
             )
 
         else:
@@ -79,7 +70,7 @@ def search():
 @login_required("professional")
 def summary():
     customer_ratings = {i: 0 for i in range(6)}
-    all_service_requests = ServiceRequest.query.filter_by(
+    all_service_requests = search_service_requests(
         professional_details_id=session["user"]
     )
     for service_request in all_service_requests:
@@ -100,7 +91,7 @@ def summary():
 @professional_view_bp.route("/accept_service/<int:id>")
 @login_required("professional")
 def accept_service_request(id):
-    service_request = ServiceRequest.query.get(id)
+    service_request = search_service_requests(id=id)
     service_request.status = "Accepted"
     db.session.commit()
     flash("Service accepted", "success")
@@ -110,7 +101,7 @@ def accept_service_request(id):
 @professional_view_bp.route("/reject_service/<int:id>")
 @login_required("professional")
 def reject_service_request(id):
-    service_request = ServiceRequest.query.get(id)
+    service_request = search_service_requests(id=id)
     service_request.status = "Rejected"
     db.session.commit()
     flash("Service rejected", "success")
@@ -121,7 +112,7 @@ def reject_service_request(id):
 @professional_view_bp.route("/close_service/<int:id>")
 @login_required("professional")
 def close_service_request(id):
-    service_request = ServiceRequest.query.get(id)
+    service_request = search_service_requests(id=id)
     service_request.status = "Completed"
     db.session.commit()
     flash("Service completed", "success")

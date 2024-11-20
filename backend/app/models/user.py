@@ -36,7 +36,7 @@ class User(BaseModel):
 
         professional_role = Role.query.filter_by(name="professional").first()
 
-        if not User.query.filter_by(username="admin@admin").first():
+        if not User.get_user(os.getenv("ADMIN_USERNAME", "admin@admin")):
             admin_user = User(
                 username=os.getenv("ADMIN_USERNAME", "admin@admin"),
                 password=os.getenv("ADMIN_PASSWORD", "Admin123"),
@@ -70,3 +70,12 @@ class User(BaseModel):
 
     def __repr__(self):
         return f"<User {self.id}: {self.username}>"
+
+    @classmethod
+    def get_user(cls, k):
+        if type(k) == int:
+            return cls.query.get(k)
+        elif type(k) == str:
+            return cls.query.filter_by(username=k).first()
+        print(f"Invalid type to get user with {k} of type {type(k)}")
+        return None

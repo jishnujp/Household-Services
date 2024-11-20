@@ -8,12 +8,17 @@ from flask import (
     Blueprint,
 )
 from datetime import datetime
-from sqlalchemy import or_
 import plotly.express as px
 import plotly.io as pio
-from app.models import User, ProfessionalDetails, Service, ServiceRequest
+from app.models import Service
 from app.utils import login_required
 from app import db
+from app.controllers import (
+    search_professional,
+    search_service,
+    create_service_request,
+    search_service_requests,
+)
 
 
 customer_view_bp = Blueprint("customer", __name__, url_prefix="/customer")
@@ -23,17 +28,15 @@ customer_view_bp = Blueprint("customer", __name__, url_prefix="/customer")
 @login_required("customer")
 def home():
     service_id = request.args.get("service")
-    request_history = ServiceRequest.query.filter_by(customer_id=session["user"]).all()
+    request_history = search_service_requests(customer_id=session["user"])
     if service_id and service_id != "all":
 
         # get ProfessionalDetails for the selected service that are approved
-        professionals = (
-            ProfessionalDetails.query.filter_by(service_id=service_id)
-            .filter_by(is_approved=True)
-            .all()
-        )
+        professionals = search_professional(service_id=service_id)
+        professionals = [prof for prof in professionals if prof.is_approved]
+
         # get the selected service
-        selected_service = Service.query.get(service_id)
+        selected_service = search_service(id=service_id)
         return render_template(
             "customer/home.html",
             professionals=professionals,
@@ -54,9 +57,7 @@ def search():
         search_by = request.form.get("search_by")
         professionals = []
         if search_by == "service":
-            services = Service.query.filter(
-                Service.name.ilike(f"%{search_query}%")
-            ).all()
+            services = search_service(name__like=search_query)
             professionals = [
                 professional
                 for service in services
@@ -64,23 +65,15 @@ def search():
                 if professional.is_approved
             ]
         elif search_by == "professional":
-            professionals = (
-                ProfessionalDetails.query.join(User)
-                .filter(
-                    or_(
-                        User.username.ilike(f"%{search_query}%"),
-                        ProfessionalDetails.business_name.ilike(f"%{search_query}%"),
-                        User.full_name.ilike(f"%{search_query}%"),
-                    )
-                )
-                .all()
+            professionals = search_professional(
+                username__like=search_query,
+                business_name__like=search_query,
+                full_name__like=search_query,
             )
+
         elif search_by == "pincode":
-            professionals = (
-                ProfessionalDetails.query.join(User)
-                .filter(User.pincode.ilike(f"%{search_query}%"))
-                .all()
-            )
+            professionals = search_professional(pincode__like=search_query)
+
         else:
             flash("Invalid search criteria", "danger")
             return redirect(url_for("customer.home"))
@@ -92,9 +85,7 @@ def search():
 @customer_view_bp.route("/summary")
 @login_required("customer")
 def summary():
-    all_service_requests = ServiceRequest.query.filter_by(
-        customer_id=session["user"]
-    ).all()
+    all_service_requests = search_service_requests(customer_id=session["user"])
 
     status_count = {}
     for service_request in all_service_requests:
@@ -118,28 +109,23 @@ def summary():
 @customer_view_bp.route("/book/<int:id>", methods=["GET", "POST"])
 @login_required("customer")
 def book_service(id):
-    professional = ProfessionalDetails.query.get(id)
 
-    user = User.query.get(session["user"])
-    # TODO: Check if the professinoal is approved
     if request.method == "POST":
-        print(f"Service requested by {user.username} to {professional.user.username}")
         service_date = request.form.get("service_date")
         service_date = datetime.strptime(service_date, "%Y-%m-%d")
-        service_request = ServiceRequest(
+        stat, msg = create_service_request(
             customer_id=session["user"],
             professional_details_id=id,
-            service_id=professional.service_id,
             date_of_service=service_date,
             remarks=request.form.get("remarks"),
-            professional_details=professional,
-            user=user,
         )
-        db.session.add(service_request)
-        db.session.commit()
-        flash("Service booked successfully", "success")
+        if not stat:
+            flash(msg, "danger")
+            return redirect(url_for("customer.home"))
+        flash(msg, "success")
         return redirect(url_for("customer.home"))
     elif request.method == "GET":
+        professional = search_professional(id=id)
         return render_template("customer/book.html", professional=professional)
 
 
@@ -147,7 +133,7 @@ def book_service(id):
 @customer_view_bp.route("/submit_review/<int:id>", methods=["POST"])
 @login_required("customer")
 def submit_review(id):
-    service_request = ServiceRequest.query.get(id)
+    service_request = search_service_requests(id=id)
     service_request.review = request.form.get("review")
     service_request.rating = int(request.form.get("rating"))
     db.session.commit()
