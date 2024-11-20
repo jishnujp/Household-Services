@@ -24,7 +24,7 @@ public_view_bp = Blueprint("public", __name__, url_prefix="/")
 
 @public_view_bp.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("home.html")
 
 
 @public_view_bp.route("/login", methods=["GET", "POST"])
@@ -123,11 +123,6 @@ def register(role):
                 "register.html", role=role, available_services=services
             )
         return render_template("register.html", role=role)
-
-
-@public_view_bp.route("/search")
-def search():
-    return render_template("search.html")
 
 
 @public_view_bp.route("/uploads/images/<filename>")
