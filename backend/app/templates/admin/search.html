@@ -148,6 +148,44 @@
         </table>
     </div>
     {% endif %}
+    {% if service_requests %}
+
+    <!-- table to display the requests -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Requested date</th>
+                <th>Service Date</th>
+                <th>Cutomer</th>
+                <th>Professional</th>
+                <th>Status</th>
+                <th>View</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in service_requests %}
+            <tr>
+                <td>{{ request.id }}</td>
+                <td>{{ request.created_at.date() }}</td>
+                <td>{{ request.date_of_service }}</td>
+                <td>{{ request.user.username }}
+                    {% set user = request.user %}
+                    {% include 'components/view_user_modal.html' %}
+                </td>
+                <td>{{ request.professional_details.user.username }}
+                    {% set professional = request.professional_details %}
+                    {% include 'components/view_professional_modal.html' %}
+                <td>{{ request.status }}</td>
+                <td>
+                    {% include 'components/view_review_modal.html' %}
+                </td>
+            </tr>
+        </tbody>
+
+        {% endfor %}
+
+        {% endif %}
 </div>
 
 

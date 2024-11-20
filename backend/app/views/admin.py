@@ -130,7 +130,7 @@ def search():
     if request.method == "POST":
         search_by = request.form.get("search_by")
         search_query = request.form.get("search_query")
-        services, professionals, users = [], [], []
+        services, professionals, users, service_requests = [], [], [], []
         if search_by == "service":
             services = search_service(
                 name__like=search_query, description__like=search_query
@@ -161,10 +161,38 @@ def search():
                 )
             admin_role = Role.query.filter_by(name="admin").first()
             users = [user for user in users if admin_role not in user.roles]
+        elif search_by == "service_request":
+            service_requests = []
+            service_requests += (
+                search_service_requests(remarks__like=search_query) or []
+            )
+            service_requests += (
+                search_service_requests(
+                    by="customer",
+                    address__like=search_query,
+                    full_name__like=search_query,
+                    username__like=search_query,
+                    phone__like=search_query,
+                    pincode__like=search_query,
+                )
+                or []
+            )
+            service_requests += (
+                search_service_requests(
+                    by="professional",
+                    business_name__like=search_query,
+                    description__like=search_query,
+                )
+                or []
+            )
+
         else:
             flash("Invalid search criteria", "danger")
             return redirect(url_for("admin.search"))
-        if sum([len(services), len(professionals), len(users)]) == 0:
+        if (
+            sum([len(services), len(professionals), len(users)], len(service_requests))
+            == 0
+        ):
             flash("No results found", "warning")
             return redirect(url_for("admin.search"))
         return render_template(
@@ -172,6 +200,7 @@ def search():
             services=services,
             professionals=professionals,
             users=users,
+            service_requests=service_requests,
         )
     return render_template("admin/search.html")
 
