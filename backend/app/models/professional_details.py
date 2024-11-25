@@ -18,7 +18,7 @@ class ProfessionalDetails(BaseModel):
     experience = db.Column(db.Integer, nullable=False)
     document = db.Column(db.String(50), nullable=False)
     extra_price = db.Column(db.Integer, default=0)
-
+    avg_rating = db.Column(db.Float, default=0)
     service = db.relationship("Service", back_populates="professionals")
     user = db.relationship("User", back_populates="professional_details")
     service_requests = db.relationship(

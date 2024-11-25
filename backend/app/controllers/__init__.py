@@ -10,4 +10,8 @@ from .services import (
     deactivate_service,
     search_service,
 )
-from .service_requests import create_service_request, search_service_requests
+from .service_requests import (
+    create_service_request,
+    search_service_requests,
+    rate_and_review,
+)

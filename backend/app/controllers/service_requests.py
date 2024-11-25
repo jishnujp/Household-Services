@@ -74,3 +74,30 @@ def search_service_requests(by=None, **kwargs):
         return ServiceRequest.query.join(join_table).filter(or_(*filters)).all()
     else:
         return ServiceRequest.query.filter(or_(*filters)).all()
+
+
+def rate_and_review(service_request_id, data):
+    try:
+        service_request = ServiceRequest.query.get(service_request_id)
+        if not service_request:
+            return False, "Service request not found"
+        professional = service_request.professional_details
+        service_request.rating = data.get("rating")
+        service_request.review = data.get("review")
+        db.session.commit()
+        all_ratings = [
+            service_request.rating
+            for service_request in ServiceRequest.query.filter_by(
+                professional_details_id=professional.id
+            ).all()
+            if service_request.rating
+        ]
+        print("ALL rating", all_ratings)
+        professional.avg_rating = sum(all_ratings) / len(all_ratings)
+        db.session.commit()
+        return True, "Rated and reviewed successfully"
+    except Exception as e:
+        db.session.rollback()
+        from traceback import print_exc
+
+        print_exc()

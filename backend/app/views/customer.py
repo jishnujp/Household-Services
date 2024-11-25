@@ -18,6 +18,7 @@ from app.controllers import (
     search_service,
     create_service_request,
     search_service_requests,
+    rate_and_review,
 )
 
 
@@ -33,7 +34,8 @@ def home():
 
         # get ProfessionalDetails for the selected service that are approved
         professionals = search_professional(service_id=service_id)
-
+        # sort professional by avg_rating
+        professionals = sorted(professionals, key=lambda x: x.avg_rating, reverse=True)
         # get the selected service
         selected_service = search_service(id=service_id)
         return render_template(
@@ -132,12 +134,12 @@ def book_service(id):
 @customer_view_bp.route("/submit_review/<int:id>", methods=["POST"])
 @login_required("customer")
 def submit_review(id):
-    service_request = search_service_requests(id=id)
-    service_request.review = request.form.get("review")
-    service_request.rating = int(request.form.get("rating"))
-    db.session.commit()
-    print(f"Review submitted for service request {id}")
-    print(f"Review: {service_request.review}")
-    print(f"Rating: {service_request.rating}")
-    flash("Review submitted successfully", "success")
+    stat, msg = rate_and_review(
+        service_request_id=id,
+        data=request.form.to_dict(),
+    )
+    if not stat:
+        flash("Failed to submit review", "danger")
+        return redirect(url_for("customer.home"))
+    flash(msg, "success")
     return redirect(url_for("customer.home"))

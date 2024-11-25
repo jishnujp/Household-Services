@@ -74,7 +74,7 @@
                             alt="{{ professional.name }}" width="100" height="100"></td>
                     <td>{{ professional.experience }}</td>
                     <td>{{ professional.service.name }}</td>
-                    <td>{{ professional.average_rating }}</td>
+                    <td>{{ professional.avg_rating }}</td>
                     <td>
                         {% if professional.is_deactivated == True %}
                         <a href="{{ url_for('admin.approve_professional', id=professional.id) }}"
