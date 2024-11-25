@@ -1,5 +1,9 @@
 from .user import create_customer, search_user
-from .professional import create_professional, search_professional
+from .professional import (
+    create_professional,
+    search_professional,
+    activate_professional,
+)
 from .services import (
     create_service,
     update_service,

@@ -76,7 +76,7 @@
                     <td>{{ professional.service.name }}</td>
                     <td>{{ professional.average_rating }}</td>
                     <td>
-                        {% if professional.is_approved == False %}
+                        {% if professional.is_deactivated == True %}
                         <a href="{{ url_for('admin.approve_professional', id=professional.id) }}"
                             class="btn btn-success">Approve</a>
                         {% else %}

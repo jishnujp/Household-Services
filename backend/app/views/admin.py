@@ -8,7 +8,7 @@ from flask import (
 )
 import plotly.express as px
 import plotly.io as pio
-from app.models import Service, Role
+from app.models import Service, Role, ProfessionalDetails
 from app.utils import login_required
 from app import db
 from app.controllers import (
@@ -17,6 +17,8 @@ from app.controllers import (
     search_service,
     search_service_requests,
     create_service,
+    deactivate_service,
+    activate_professional,
 )
 
 admin_view_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -28,7 +30,7 @@ def home():
     return render_template(
         "admin/home.html",
         services=Service.query.with_deactivated().all(),
-        professionals=search_professional(),
+        professionals=ProfessionalDetails.query.with_deactivated().all(),
         service_requests=search_service_requests(),
     )
 
@@ -53,20 +55,17 @@ def add_service():
 @admin_view_bp.route("/approve_professional/<int:id>")
 @login_required("admin")
 def approve_professional(id):
-    professional = search_professional(id=id)
-    professional.is_approved = True
-    db.session.commit()
-    flash("Professional approved", "success")
+    stat, msg = activate_professional(id)
+    color = "success" if stat else "danger"
+    flash(msg, color)
     return redirect(url_for("admin.home"))
 
 
 @admin_view_bp.route("/block_professional/<int:id>")
 @login_required("admin")
 def block_professional(id):
-    professional = search_professional(id=id)
-    professional.is_approved = False
-    db.session.add(professional)
-    db.session.commit()
+    professional = ProfessionalDetails.query.get(id)
+    professional.deactivate()
     flash("Professional blocked", "success")
     return redirect(url_for("admin.home"))
 
@@ -102,10 +101,14 @@ def edit_service(id):
 
 @admin_view_bp.route("/deactivate_service/<int:id>", methods=["POST"])
 @login_required("admin")
-def deactivate_service(id):
-    service = search_service(id=id)
-    service.deactivate()
-    flash("Service deactivated successfully", "success")
+def deactivate_service_view(id):
+    try:
+        deactivate_service(id)
+        flash("Service deactivated successfully", "success")
+    except Exception as e:
+        print(e)
+        flash(f"Error in deactivating service", "danger")
+        raise e
     return redirect(url_for("admin.home"))
 
 

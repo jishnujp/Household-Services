@@ -29,7 +29,7 @@ def create_professional(data: dict):
         experience=int(data["experience"]),
         document=pdf_file,
         extra_price=data.get("extra_price", 0),
-        is_approved=False,
+        is_deactivated=True,
     )
     db.session.add(professional_details)
     db.session.commit()
@@ -80,3 +80,16 @@ def search_professional(**kwargs):
         return ProfessionalDetails.query.join(User).filter(or_(*filters)).all()
     else:
         return ProfessionalDetails.query.filter(or_(*filters)).all()
+
+
+def activate_professional(id: int):
+    try:
+        professional = ProfessionalDetails.query.with_deactivated().get(id)
+        if professional.service.is_deactivated:
+            return False, "Service is deactivated"
+
+        professional.activate()
+        return True, "Professional approved"
+    except Exception as e:
+        print("Error in activating professional", e)
+        return False, "Error in activating professional"

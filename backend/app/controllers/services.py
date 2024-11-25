@@ -32,8 +32,8 @@ def update_service(data: dict):
 def deactivate_service(id: int):
     service = Service.query.get(id)
     for professional in service.professionals:
-        print(professional)
-        professional.deactivate()
+        if not professional.is_deactivated:
+            professional.deactivate()
     if not service:
         raise Exception("Service not found")
     service.deactivate()
