@@ -5,7 +5,7 @@ from app.models import Service
 
 
 def create_service(data: dict):
-    existing_service = Service.query.filter_by(name=data["name"]).first()
+    existing_service = Service.query.filter_by(name=data["service_name"]).first()
     if existing_service:
         raise Exception("Service already exists with this name")
     new_service = Service(
@@ -29,12 +29,14 @@ def update_service(data: dict):
     return service
 
 
-def delete_service(id: int):
+def deactivate_service(id: int):
     service = Service.query.get(id)
+    for professional in service.professionals:
+        print(professional)
+        professional.deactivate()
     if not service:
         raise Exception("Service not found")
-    db.session.delete(service)
-    db.session.commit()
+    service.deactivate()
     return service
 
 

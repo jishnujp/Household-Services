@@ -3,16 +3,18 @@ from app import db
 from app.models import User, ProfessionalDetails, ServiceRequest
 
 
-def create_service_request(customer_id, professional_id, date_of_service, remarks):
+def create_service_request(
+    customer_id, professional_details_id, date_of_service, remarks
+):
     try:
         user = User.query.get(customer_id)
-        professional = ProfessionalDetails.query.get(professional_id)
+        professional = ProfessionalDetails.query.get(professional_details_id)
         # TODO: Check if the professinoal is approved
         if not user or not professional:
             return False, "Invalid customer or professional"
         service_request = ServiceRequest(
             customer_id=customer_id,
-            professional_details_id=professional_id,
+            professional_details_id=professional_details_id,
             service_id=professional.service_id,
             date_of_service=date_of_service,
             remarks=remarks,

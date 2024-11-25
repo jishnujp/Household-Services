@@ -43,7 +43,7 @@ def home():
             selected_service=selected_service,
             request_history=request_history,
         )
-    all_service = Service.query.filter(Service.name != "NoService").all()
+    all_service = Service.query.all()
     return render_template(
         "customer/home.html", services=all_service, request_history=request_history
     )

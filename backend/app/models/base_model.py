@@ -7,22 +7,51 @@ from sqlalchemy.orm import Query
 ## Reference: https://blog.miguelgrinberg.com/post/implementing-the-soft-delete-pattern-with-flask-and-sqlalchemy
 
 
-class SoftDeleteQuery(Query):
+class DeactivateQuery(Query):
     def __init__(self, entities, *args, **kwargs):
         super().__init__(entities, *args, **kwargs)
         # Apply the filter by default on initialization
-        self._with_deleted = False
-        self = self.filter_by(is_deleted=False)
+        self._with_deactivated = False
+        self = self.filter_by(is_deactivated=False)
 
-    def with_deleted(self):
-        """Allow including deleted entries in the query."""
-        self._with_deleted = True
+    def with_deactivated(self):
+        """Allow including deactivate entries in the query."""
+        self._with_deactivated = True
         return self
 
-    def __iter__(self):
-        if not self._with_deleted:
-            self = self.filter_by(is_deleted=False)
-        return super().__iter__()
+    def filter(self, *criterion):
+        if not self._with_deactivated:
+            # Retrieve the entity(model) from column_descriptions
+            entity = self.column_descriptions[0]["entity"]
+            criterion = criterion + (entity.is_deactivated == False,)
+        return super().filter(*criterion)
+
+    def filter_by(self, **kwargs):
+        if not self._with_deactivated:
+            kwargs["is_deactivated"] = False
+        return super().filter_by(**kwargs)
+
+    def all(self):
+        """Override .all() to ensure is_deactivated=False is applied by default."""
+        if not self._with_deactivated:
+            entity = self.column_descriptions[0]["entity"]
+            self = self.filter(entity.is_deactivated == False)
+        return super().all()
+
+    def first(self):
+        """Override .first() to ensure is_deactivated=False is applied by default."""
+        if not self._with_deactivated:
+            entity = self.column_descriptions[0]["entity"]
+            self = self.filter(entity.is_deactivated == False)
+        return super().first()
+
+    def count(self):
+        """Override .count() to ensure is_deactivated=False is applied by default."""
+        if not self._with_deactivated:
+            # Retrieve the entity (model) from column_descriptions
+            entity = self.column_descriptions[0]["entity"]
+            self = self.filter(entity.is_deactivated == False)
+        return super().count()
 
 
 # NOTE: Faced the `TypeError: metaclass conflict` when tried multiple inheritance with `BaseModel` and `ABC`, to make it an abstract class.
@@ -32,14 +61,14 @@ class SoftDeleteQuery(Query):
 
 class BaseModel(db.Model):
     __abstract__ = True
-    query_class = SoftDeleteQuery
+    query_class = DeactivateQuery
 
     @declared_attr
-    def is_deleted(cls):
+    def is_deactivated(cls):
         return db.Column(db.Boolean, default=False)
 
     @declared_attr
-    def deleted_at(cls):
+    def deactivate_at(cls):
         return db.Column(db.DateTime, nullable=True)
 
     @declared_attr
@@ -63,11 +92,16 @@ class BaseModel(db.Model):
                 setattr(self, key, value)
         db.session.commit()
 
-    def soft_delete(self):
-        self.is_deleted = True
-        self.deleted_at = datetime.now(timezone.utc)
+    def deactivate(self):
+        if self.is_deactivated:
+            raise Exception("Already deactivated")
+        self.is_deactivated = True
+        self.deactivate_at = datetime.now(timezone.utc)
         db.session.commit()
 
-    def hard_delete(self):
-        db.session.delete(self)
+    def activate(self):
+        if not self.is_deactivated:
+            raise Exception("Already activated")
+        self.is_deactivated = False
+        self.deactivate_at = datetime.now(timezone.utc)
         db.session.commit()

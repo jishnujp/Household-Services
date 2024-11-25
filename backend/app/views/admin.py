@@ -16,6 +16,7 @@ from app.controllers import (
     search_user,
     search_service,
     search_service_requests,
+    create_service,
 )
 
 admin_view_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -26,7 +27,7 @@ admin_view_bp = Blueprint("admin", __name__, url_prefix="/admin")
 def home():
     return render_template(
         "admin/home.html",
-        services=Service.query.filter(Service.name != "NoService").all(),
+        services=Service.query.with_deactivated().all(),
         professionals=search_professional(),
         service_requests=search_service_requests(),
     )
@@ -36,13 +37,14 @@ def home():
 @login_required("admin")
 def add_service():
     if request.method == "POST":
-        name = request.form.get("service_name")
-        description = request.form.get("service_description")
-        base_price = request.form.get("base_price")
-        service = Service(name=name, description=description, base_price=base_price)
-        db.session.add(service)
-        db.session.commit()
-        flash("Service added successfully", "success")
+        try:
+            create_service(request.form.to_dict())
+            flash("Service added successfully", "success")
+        except Exception as e:
+            from traceback import print_exc
+
+            print_exc()
+            flash(f"Error in adding service: {str(e)}", "danger")
         return redirect(url_for("admin.home"))
     elif request.method == "GET":
         return render_template("admin/add_service.html")
@@ -98,29 +100,22 @@ def edit_service(id):
         return render_template("admin/add_service.html", service=service)
 
 
-@admin_view_bp.route("/delete_service/<int:id>", methods=["POST"])
+@admin_view_bp.route("/deactivate_service/<int:id>", methods=["POST"])
 @login_required("admin")
-def delete_service(id):
+def deactivate_service(id):
     service = search_service(id=id)
-    if not service:
-        flash("Service not found.", "error")
-        return redirect(url_for("admin.home"))
+    service.deactivate()
+    flash("Service deactivated successfully", "success")
+    return redirect(url_for("admin.home"))
 
-    noservice = Service.query.filter_by(name="NoService").first()
-    if not noservice:
-        noservice = Service(
-            name="NoService", description="No service selected", base_price=0
-        )
-        db.session.add(noservice)
-        db.session.commit()
-    for professional in service.professionals:
-        professional.service_id = noservice.id
-        professional.is_approved = False
-    db.session.commit()
 
-    db.session.delete(service)
-    db.session.commit()
-    flash("Service deleted successfully", "success")
+@admin_view_bp.route("/activate_service/<int:id>", methods=["POST"])
+@login_required("admin")
+def activate_service(id):
+    print("Activating service")
+    service = search_service(id=id)
+    service.activate()
+    flash("Service activated successfully", "success")
     return redirect(url_for("admin.home"))
 
 
