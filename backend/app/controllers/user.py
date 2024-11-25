@@ -34,11 +34,11 @@ def create_customer(data: dict):
     return new_user
 
 
-def search_user(**kwargs):
+def search_user(with_deactivated=False, **kwargs):
     if kwargs is None:
-        return User.query.all()
+        return User.query.with_deactivated(with_deactivated).all()
     if "id" in kwargs:
-        return User.query.get(kwargs["id"])
+        return User.query.with_deactivated(with_deactivated).get(kwargs["id"])
     filters = []
     for key, value in kwargs.items():
         if "__" in key:
@@ -65,5 +65,6 @@ def search_user(**kwargs):
             filters.append(column <= value)
         else:
             raise Exception(f"Invalid operator {op}")
+    print("With deactivated", with_deactivated)
 
-    return User.query.filter(or_(*filters)).all()
+    return User.query.with_deactivated(with_deactivated).filter(or_(*filters)).all()

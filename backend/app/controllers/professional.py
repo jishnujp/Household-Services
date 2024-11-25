@@ -37,11 +37,13 @@ def create_professional(data: dict):
 
 
 # Read
-def search_professional(**kwargs):
+def search_professional(with_deactivated=False, **kwargs):
     if kwargs is None:
-        return ProfessionalDetails.query.all()
+        return ProfessionalDetails.query.with_deactivated(with_deactivated).all()
     if "id" in kwargs:
-        return ProfessionalDetails.query.get(kwargs["id"])
+        return ProfessionalDetails.query.with_deactivated(with_deactivated).get(
+            kwargs["id"]
+        )
     filters = []
     join = False
     for key, value in kwargs.items():
@@ -77,16 +79,25 @@ def search_professional(**kwargs):
             raise Exception(f"Invalid operator {op}")
 
     if join:
-        return ProfessionalDetails.query.join(User).filter(or_(*filters)).all()
+        return (
+            ProfessionalDetails.query.with_deactivated(with_deactivated)
+            .join(User)
+            .filter(or_(*filters))
+            .all()
+        )
     else:
-        return ProfessionalDetails.query.filter(or_(*filters)).all()
+        return (
+            ProfessionalDetails.query.with_deactivated(with_deactivated)
+            .filter(or_(*filters))
+            .all()
+        )
 
 
 def activate_professional(id: int):
     try:
         professional = ProfessionalDetails.query.with_deactivated().get(id)
         if professional.service.is_deactivated:
-            return False, "Service is deactivated"
+            return False, "Service is not activate, activate it first."
 
         professional.activate()
         return True, "Professional approved"

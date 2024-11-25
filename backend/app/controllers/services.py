@@ -40,11 +40,11 @@ def deactivate_service(id: int):
     return service
 
 
-def search_service(**kwargs):
+def search_service(with_deactivated=False, **kwargs):
     if kwargs is None:
-        return Service.query.all()
+        return Service.query.with_deactivated(with_deactivated).all()
     if "id" in kwargs:
-        return Service.query.get(kwargs["id"])
+        return Service.query.with_deactivated(with_deactivated).get(kwargs["id"])
     filters = []
     for key, value in kwargs.items():
         if "__" in key:
@@ -72,4 +72,4 @@ def search_service(**kwargs):
         else:
             raise Exception(f"Invalid operator {op}")
 
-    return Service.query.filter(or_(*filters)).all()
+    return Service.query.with_deactivated(with_deactivated).filter(or_(*filters)).all()

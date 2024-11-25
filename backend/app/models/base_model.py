@@ -14,9 +14,10 @@ class DeactivateQuery(Query):
         self._with_deactivated = False
         self = self.filter_by(is_deactivated=False)
 
-    def with_deactivated(self):
+    def with_deactivated(self, with_deactivated=True):
         """Allow including deactivate entries in the query."""
-        self._with_deactivated = True
+        print("with_deactivated", with_deactivated)
+        self._with_deactivated = with_deactivated
         return self
 
     def filter(self, *criterion):
