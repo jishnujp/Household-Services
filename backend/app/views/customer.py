@@ -33,7 +33,6 @@ def home():
 
         # get ProfessionalDetails for the selected service that are approved
         professionals = search_professional(service_id=service_id)
-        professionals = [prof for prof in professionals if prof.is_approved]
 
         # get the selected service
         selected_service = search_service(id=service_id)
@@ -58,12 +57,12 @@ def search():
         professionals = []
         if search_by == "service":
             services = search_service(name__like=search_query)
-            professionals = [
-                professional
-                for service in services
-                for professional in service.professionals
-                if professional.is_approved
-            ]
+            # professionals = [
+            #     professional
+            #     for service in services
+            #     for professional in service.professionals
+            #     if professional.is_deactivated is False
+            # ]
         elif search_by == "professional":
             professionals = search_professional(
                 username__like=search_query,

@@ -60,7 +60,14 @@
                     <td>{{ service.base_price }}</td>
                     <td>
                         {% include 'components/service_modal.html' %}
+                        {% if service.is_deactivated %}
+                        <form action="{{ url_for('admin.activate_service', id=service.id) }}" method="POST"
+                            style="display: inline;">
+                            <button type="submit" class="btn btn-success">Activate</button>
+                        </form>
+                        {% else %}
                         {% include 'components/del_service_modal.html' %}
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -97,6 +104,12 @@
                     <td>{{ user.address }} <br> Pincode: {{ user.pincode }}</td>
                     <td>
                         {% include 'components/view_user_modal.html' %}
+                        {% if user.is_deactivated %}
+                        <a href="{{ url_for('admin.activate_user', id=user.id) }}" class="btn btn-success">Activate</a>
+                        {% else %}
+                        <a href="{{ url_for('admin.deactivate_user', id=user.id) }}"
+                            class="btn btn-danger">Deactivate</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -132,7 +145,7 @@
                     <td>{{ professional.user.phone }}</td>
                     <td>{{ professional.user.address }}</td>
                     <td>
-                        {% if professional.is_approved == False %}
+                        {% if professional.is_deactivated == True %}
                         <a href="{{ url_for('admin.approve_professional', id=professional.id) }}"
                             class="btn btn-success">Approve</a>
                         {% else %}

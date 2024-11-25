@@ -29,8 +29,8 @@ admin_view_bp = Blueprint("admin", __name__, url_prefix="/admin")
 def home():
     return render_template(
         "admin/home.html",
-        services=Service.query.with_deactivated().all(),
-        professionals=ProfessionalDetails.query.with_deactivated().all(),
+        services=search_service(with_deactivated=True),
+        professionals=search_professional(with_deactivated=True),
         service_requests=search_service_requests(),
     )
 
@@ -73,14 +73,32 @@ def block_professional(id):
 @admin_view_bp.route("/view_professional/<int:id>")
 @login_required("admin")
 def view_professional(id):
-    professional = search_professional(id=id)
+    professional = search_professional(with_deactivated=True, id=id)
     return render_template("admin/view_professional.html", professional=professional)
+
+
+@admin_view_bp.route("/activate_user/<int:id>")
+@login_required("admin")
+def activate_user(id):
+    user = search_user(with_deactivated=True, id=id)
+    user.activate()
+    flash("User activated successfully", "success")
+    return redirect(url_for("admin.home"))
+
+
+@admin_view_bp.route("/deactivate_user/<int:id>")
+@login_required("admin")
+def deactivate_user(id):
+    user = search_user(id=id)
+    user.deactivate()
+    flash("User deactivated successfully", "success")
+    return redirect(url_for("admin.home"))
 
 
 @admin_view_bp.route("/edit_service/<int:id>", methods=["GET", "POST"])
 @login_required("admin")
 def edit_service(id):
-    service = search_service(id=id)
+    service = search_service(with_deactivated=True, id=id)
     if request.method == "POST":
         new_name = request.form.get("service_name")
         new_desc = request.form.get("service_description")
@@ -116,7 +134,7 @@ def deactivate_service_view(id):
 @login_required("admin")
 def activate_service(id):
     print("Activating service")
-    service = search_service(id=id)
+    service = search_service(with_deactivated=True, id=id)
     service.activate()
     flash("Service activated successfully", "success")
     return redirect(url_for("admin.home"))
@@ -131,16 +149,21 @@ def search():
         services, professionals, users, service_requests = [], [], [], []
         if search_by == "service":
             services = search_service(
-                name__like=search_query, description__like=search_query
+                with_deactivated=True,
+                name__like=search_query,
+                description__like=search_query,
             )
 
         elif search_by == "professional":
             if search_query.isdigit():
                 professionals = search_professional(
-                    phone__like=search_query, pincode__like=search_query
+                    with_deactivated=True,
+                    phone__like=search_query,
+                    pincode__like=search_query,
                 )
             else:
                 professionals = search_professional(
+                    with_deactivated=True,
                     username__like=search_query,
                     business_name__like=search_query,
                     description__like=search_query,
@@ -151,11 +174,15 @@ def search():
         elif search_by == "customer":
             if search_query.isdigit():
                 users = search_user(
-                    phone__like=search_query, pincode__like=search_query
+                    with_deactivated=True,
+                    phone__like=search_query,
+                    pincode__like=search_query,
                 )
             else:
                 users = search_user(
-                    username__like=search_query, full_name__like=search_query
+                    with_deactivated=True,
+                    username__like=search_query,
+                    full_name__like=search_query,
                 )
             admin_role = Role.query.filter_by(name="admin").first()
             users = [user for user in users if admin_role not in user.roles]
