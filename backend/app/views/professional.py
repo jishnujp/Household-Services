@@ -115,5 +115,15 @@ def close_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Completed"
     db.session.commit()
-    flash("Service completed", "success")
+    flash("Service Closed", "success")
+    return redirect(url_for("professional.home"))
+
+
+@professional_view_bp.route("/cancel_service/<int:id>")
+@login_required("professional")
+def cancel_service_request(id):
+    service_request = search_service_requests(id=id)
+    service_request.status = "Cancelled"
+    db.session.commit()
+    flash("Service Cancelled", "success")
     return redirect(url_for("professional.home"))

@@ -37,10 +37,12 @@
                         {% elif request.status == 'Completed' and request.review != None %}
                         <a href="#" class="btn btn-primary">Update View</a>
                         {% elif request.status == 'Accepted' %}
-                        <a href="#" class="btn btn-warning">Close</a>
+                        <a href="{{ url_for('customer.close_service_request', id=request.id) }}"
+                            class="btn btn-warning">Close</a>
                         {% endif %}
                         {% if request.status in ['Pending', 'Accepted'] %}
-                        <a href="#" class="btn btn-danger">Cancel</a>
+                        <a href="{{ url_for('customer.cancel_service_request', id=request.id) }}"
+                            class="btn btn-danger">Cancel</a>
                         {% endif %}
                         <br>
                         {% include 'components/view_review_modal.html' %}

@@ -143,3 +143,23 @@ def submit_review(id):
         return redirect(url_for("customer.home"))
     flash(msg, "success")
     return redirect(url_for("customer.home"))
+
+
+@customer_view_bp.route("/close_service/<int:id>")
+@login_required("customer")
+def close_service_request(id):
+    service_request = search_service_requests(id=id)
+    service_request.status = "Completed"
+    db.session.commit()
+    flash("Service Closed", "success")
+    return redirect(url_for("customer.home"))
+
+
+@customer_view_bp.route("/cancel_service/<int:id>")
+@login_required("customer")
+def cancel_service_request(id):
+    service_request = search_service_requests(id=id)
+    service_request.status = "Cancelled"
+    db.session.commit()
+    flash("Service Cancelled", "success")
+    return redirect(url_for("customer.home"))

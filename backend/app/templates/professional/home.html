@@ -47,6 +47,7 @@
             <th>Customer Name</th>
             <th>Contact Number</th>
             <th>Location</th>
+            <th>Status</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -56,6 +57,7 @@
         <td>{{ request.user.full_name }}</td>
         <td>{{ request.user.phone }}</td>
         <td>{{ request.user.address }} <br>Pincode: {{ request.user.pincode }} </td>
+        <td>{{ request.status }}</td>
         <td>
             {% if request.status == 'Pending' %}
             <a href="{{ url_for('professional.accept_service_request', id=request.id) }}"
@@ -64,6 +66,10 @@
                 class="btn btn-danger">Reject</a>
             {% endif %}
             {% include 'components/view_review_modal.html' %}
+            {% if request.status in ['Pending', 'Accepted'] %}
+            <a href="{{ url_for('professional.cancel_service_request', id=request.id) }}"
+                class="btn btn-danger">Cancel</a>
+            {% endif %}
         </td>
     </tr>
     {% endfor %}
