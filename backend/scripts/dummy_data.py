@@ -82,7 +82,7 @@ users = [
             "experience": 10,
             "document": "https://mi01000971.schoolwires.net/cms/lib/MI01000971/Centricity/Domain/2059/Greek%20God%20Pantheon.pdf",
             "extra_price": 50,
-            "is_approved": False,
+            "is_deactivated": False,
         },
     },
     {
@@ -101,7 +101,7 @@ users = [
             "experience": 20,
             "document": "https://cavitt.eurekausd.org/documents/Parents/PTC/Art%20Docent%20Presentations/7th%20Grade/7th%20Gr%20T3%20-%20Italian%20Renaissance%20%20Classroom%20Presentation.pdf",
             "extra_price": 100,
-            "is_approved": False,
+            "is_deactivated": True,
         },
     },
     {
@@ -163,7 +163,7 @@ for user in users:
             experience=user["professional_details"]["experience"],
             document=user["professional_details"]["document"],
             extra_price=user["professional_details"]["extra_price"],
-            is_approved=user["professional_details"]["is_approved"],
+            is_deactivated=user["professional_details"]["is_deactivated"],
         )
         db.session.add(professional_details)
 
