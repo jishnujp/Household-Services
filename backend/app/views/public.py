@@ -38,11 +38,13 @@ def login():
             messages.append("Username is required")
         if not password:
             messages.append("Password is required")
-        user = User.get_user(username)
+        user = User.query.with_deactivated().filter_by(username=username).first()
         if not user:
             messages.append("User not found")
         elif user and user.password != password:
             messages.append("Incorrect password")
+        elif user and user.is_deactivated:
+            messages.append("User is blocked, contact admin")
         elif (
             user
             and user.password == password

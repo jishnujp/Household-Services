@@ -4,6 +4,16 @@
 
 {% block content %}
 <h1>{{ professional.user.full_name}} </h1>
+<!-- warning block that says that the account is not active -->
+{% if professional.is_deactivated %}
+<div class="alert alert-warning" role="alert">
+    <strong>
+        Your professional account is not active and you will not receive any new service requests.
+        <br>
+        please contact the admin to activate your account.
+    </strong>
+</div>
+{% endif %}
 <br>
 <h2>Todays Services</h2>
 <table class="table table-striped">
