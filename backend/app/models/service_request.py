@@ -21,6 +21,9 @@ class ServiceRequest(BaseModel):
     review = db.Column(db.String(100), nullable=True)
     rating = db.Column(db.Integer, nullable=True)
 
+    cust_issue_raised = db.Column(db.Boolean, default=False)
+    prof_issue_raised = db.Column(db.Boolean, default=False)
+
     professional_details = db.relationship(
         "ProfessionalDetails", back_populates="service_requests", lazy="select"
     )

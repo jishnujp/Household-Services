@@ -127,3 +127,13 @@ def cancel_service_request(id):
     db.session.commit()
     flash("Service Cancelled", "success")
     return redirect(url_for("professional.home"))
+
+
+@professional_view_bp.route("/toggle_issue/<int:id>", methods=["POST"])
+@login_required("customer")
+def toggle_issue(id):
+    service_request = search_service_requests(id=id)
+    service_request.prof_issue_raised = not service_request.prof_issue_raised
+    db.session.commit()
+    flash("Issue Raised", "success")
+    return redirect(url_for("professional.home"))
