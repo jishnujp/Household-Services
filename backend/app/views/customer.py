@@ -132,6 +132,26 @@ def book_service(id):
         return render_template("customer/book.html", professional=professional)
 
 
+@customer_view_bp.route("/edit_service_request/<int:id>", methods=["GET", "POST"])
+@role_required(AllowableRoles.CUSTOMER)
+def edit_service_request(id):
+    if request.method == "POST":
+        service_request = search_service_requests(id=id)
+        service_request.date_of_service = datetime.strptime(
+            request.form.get("service_date"), "%Y-%m-%d"
+        )
+        service_request.remarks = request.form.get("remarks")
+        db.session.commit()
+        flash("Service Request Updated", "success")
+        return redirect(url_for("customer.home"))
+
+    service_request = search_service_requests(id=id)
+    professional = search_professional(id=service_request.professional_details_id)
+    return render_template(
+        "customer/book.html", service_request=service_request, professional=professional
+    )
+
+
 # submit_review
 @customer_view_bp.route("/submit_review/<int:id>", methods=["POST"])
 @role_required(AllowableRoles.CUSTOMER)

@@ -37,24 +37,35 @@
     </div>
 
     <div class="col-6">
-        <form action="{{ url_for('customer.book_service', id = professional.id)
-     }}" method="POST">
+        {% if service_request %}
+        {%set url=url_for('customer.edit_service_request', id=service_request.id) %}
+        {% else %}
+        {%set url=url_for('customer.book_service', id=professional.id) %}
+        {% endif %}
+        <form action={{url}} method="POST">
             <!-- Confirmation -->
 
             <div class="form-group mb-3">
                 <label for="service_date" class="form-label">Service Date</label>
                 <input name="service_date" class="form-control" type="date" id="service_date" placeholder="Service Date"
-                    required>
+                    {{ 'value=' ~ service_request.date_of_service if service_request }} required>
 
             </div>
 
             <div class="form-group mb-3">
                 <label for="remarks" class="form-label">Remarks</label>
                 <textarea name="remarks" class="form-control" id="remarks"
-                    placeholder="Write the details and expectations" required></textarea>
+                    placeholder="Write the details and expectations"
+                    required>{{ service_request.remarks if service_request }}</textarea>
             </div>
             <div class="form-group mb-3 mt-6">
-                <button type="submit" class="btn btn-primary btn-lg btn-block">Book</button>
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    {% if service_request %}
+                    Update
+                    {% else %}
+                    Book
+                    {% endif %}
+                </button>
         </form>
     </div>
 </div>

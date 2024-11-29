@@ -76,7 +76,7 @@
                 class="btn btn-danger">Reject</a>
             {% endif %}
             {% include 'components/view_review_modal.html' %}
-            {% if request.status in ['Pending', 'Accepted'] %}
+            {% if request.status in ['Pending'] %}
             <a href="{{ url_for('professional.cancel_service_request', id=request.id) }}"
                 class="btn btn-danger">Cancel</a>
             {% endif %}
