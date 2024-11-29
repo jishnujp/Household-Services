@@ -9,9 +9,10 @@ from flask import (
     send_from_directory,
     current_app as app,
 )
+from flask_login import login_user, logout_user, login_required, current_user
 import os
+from app import login_manager
 from app.models import User
-from app.utils import login_required
 from app.controllers import (
     create_customer,
     create_professional,
@@ -22,58 +23,64 @@ from app.controllers import (
 public_view_bp = Blueprint("public", __name__, url_prefix="/")
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+# Home route
 @public_view_bp.route("/")
 def home():
     return render_template("home.html")
 
 
+# Login route
 @public_view_bp.route("/login", methods=["GET", "POST"])
 def login():
+    print(current_user)
     if request.method == "POST":
         messages = []
         username = request.form.get("username")
         password = request.form.get("password")
         chosen_role = request.form.get("role")
+
         if not username:
             messages.append("Username is required")
         if not password:
             messages.append("Password is required")
-        user = User.query.with_deactivated().filter_by(username=username).first()
+
+        user = User.query.filter_by(username=username).first()
         if not user:
             messages.append("User not found")
-        elif user and user.password != password:
+        elif user.password != password:
             messages.append("Incorrect password")
-        elif user and user.is_deactivated:
+        elif user.is_deactivated:
             messages.append("User is blocked, contact admin")
-        elif (
-            user
-            and user.password == password
-            and chosen_role not in [role.name for role in user.roles]
-        ):
-
+        elif chosen_role not in [role.name for role in user.roles]:
             messages.append("You are not authorized to access this role")
+
         if messages:
             for message in messages:
                 flash(message, "danger")
             return redirect(url_for("public.login"))
 
-        if user and user.password == password:
-            session["user"] = user.id
-            session["role"] = chosen_role
-            flash("Login successful", "success")
-            return redirect(url_for(f"{chosen_role}.home"))
-        else:
-            flash("Login failed", "danger")
-            return redirect(url_for("public.login"))
-    elif request.method == "GET":
-        return render_template("login.html")
+        # Successful login
+        print(user)
+        login_user(user)
+        session["role"] = chosen_role
+        flash("Login successful", "success")
+        return redirect(url_for(f"{chosen_role}.home"))
+
+    return render_template("login.html")
 
 
+# Logout route
 @public_view_bp.route("/logout")
-@login_required()
+@login_required
 def logout():
-    session.pop("user", None)
+    logout_user()
     session.pop("role", None)
+    flash("You have been logged out.", "info")
     return redirect(url_for("public.home"))
 
 
@@ -128,7 +135,7 @@ def register(role):
 
 
 @public_view_bp.route("/uploads/images/<filename>")
-@login_required()
+@login_required
 def uploaded_image(filename):
     return send_from_directory(
         os.path.join(app.config["IMAGE_UPLOAD_FOLDER"]),
@@ -137,7 +144,7 @@ def uploaded_image(filename):
 
 
 @public_view_bp.route("/uploads/files/<filename>")
-@login_required()
+@login_required
 def uploaded_file(filename):
     return send_from_directory(
         os.path.join(app.config["FILE_UPLOAD_FOLDER"]),

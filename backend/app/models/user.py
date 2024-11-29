@@ -1,10 +1,11 @@
 from sqlalchemy.orm import validates
 import os
+from flask_login import UserMixin
 from app import db
 from app.models.base_model import BaseModel
 
 
-class User(BaseModel):
+class User(BaseModel, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False, index=True)
     password = db.Column(db.String(60), nullable=False)
@@ -79,3 +80,9 @@ class User(BaseModel):
             return cls.query.filter_by(username=k).first()
         print(f"Invalid type to get user with {k} of type {type(k)}")
         return None
+
+    def get_id(self):
+        return str(self.id)
+
+    def is_active(self):
+        return not self.is_deactivated

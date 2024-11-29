@@ -1,5 +1,6 @@
 from hashlib import md5
-from flask import session, redirect, url_for, abort
+from flask import redirect, url_for, abort
+from flask_login import current_user
 from functools import wraps
 from app.models import User
 
@@ -18,16 +19,13 @@ def hash_file(file_path):
         return hash_file_object(file_object)
 
 
-def login_required(role=None):
+def role_required(role=None):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if "user" not in session:
-                return redirect(url_for("login"))
-
-            user_id = session["user"]
-
-            user_permissions = [urole.name for urole in User.get_user(user_id).roles]
+            if not current_user.is_authenticated:
+                return redirect(url_for("public.login"))
+            user_permissions = [urole.name for urole in current_user.roles]
             if role and role not in user_permissions:
                 abort(403)
 

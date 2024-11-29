@@ -9,7 +9,7 @@ from flask import (
 import plotly.express as px
 import plotly.io as pio
 from app.models import Service, Role, ProfessionalDetails
-from app.utils import login_required
+from app.utils import role_required
 from app import db
 from app.controllers import (
     search_professional,
@@ -25,7 +25,7 @@ admin_view_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
 @admin_view_bp.route("/home")
-@login_required("admin")
+@role_required("admin")
 def home():
     return render_template(
         "admin/home.html",
@@ -36,7 +36,7 @@ def home():
 
 
 @admin_view_bp.route("/add_service", methods=["GET", "POST"])
-@login_required("admin")
+@role_required("admin")
 def add_service():
     if request.method == "POST":
         try:
@@ -53,7 +53,7 @@ def add_service():
 
 
 @admin_view_bp.route("/approve_professional/<int:id>")
-@login_required("admin")
+@role_required("admin")
 def approve_professional(id):
     stat, msg = activate_professional(id)
     color = "success" if stat else "danger"
@@ -62,7 +62,7 @@ def approve_professional(id):
 
 
 @admin_view_bp.route("/block_professional/<int:id>")
-@login_required("admin")
+@role_required("admin")
 def block_professional(id):
     professional = ProfessionalDetails.query.get(id)
     professional.deactivate()
@@ -71,14 +71,14 @@ def block_professional(id):
 
 
 @admin_view_bp.route("/view_professional/<int:id>")
-@login_required("admin")
+@role_required("admin")
 def view_professional(id):
     professional = search_professional(with_deactivated=True, id=id)
     return render_template("admin/view_professional.html", professional=professional)
 
 
 @admin_view_bp.route("/activate_user/<int:id>")
-@login_required("admin")
+@role_required("admin")
 def activate_user(id):
     user = search_user(with_deactivated=True, id=id)
     user.activate()
@@ -87,7 +87,7 @@ def activate_user(id):
 
 
 @admin_view_bp.route("/deactivate_user/<int:id>")
-@login_required("admin")
+@role_required("admin")
 def deactivate_user(id):
     user = search_user(id=id)
     user.deactivate()
@@ -96,7 +96,7 @@ def deactivate_user(id):
 
 
 @admin_view_bp.route("/edit_service/<int:id>", methods=["GET", "POST"])
-@login_required("admin")
+@role_required("admin")
 def edit_service(id):
     service = search_service(with_deactivated=True, id=id)
     if request.method == "POST":
@@ -118,7 +118,7 @@ def edit_service(id):
 
 
 @admin_view_bp.route("/deactivate_service/<int:id>", methods=["POST"])
-@login_required("admin")
+@role_required("admin")
 def deactivate_service_view(id):
     try:
         deactivate_service(id)
@@ -131,7 +131,7 @@ def deactivate_service_view(id):
 
 
 @admin_view_bp.route("/activate_service/<int:id>", methods=["POST"])
-@login_required("admin")
+@role_required("admin")
 def activate_service(id):
     print("Activating service")
     service = search_service(with_deactivated=True, id=id)
@@ -141,7 +141,7 @@ def activate_service(id):
 
 
 @admin_view_bp.route("/search", methods=["GET", "POST"])
-@login_required("admin")
+@role_required("admin")
 def search():
     if request.method == "POST":
         search_by = request.form.get("search_by")
@@ -231,7 +231,7 @@ def search():
 
 
 @admin_view_bp.route("/summary")
-@login_required("admin")
+@role_required("admin")
 def summary():
     # get all the customer ratings
     customer_ratings = {i: 0 for i in range(6)}

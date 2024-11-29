@@ -2,8 +2,9 @@ from flask import render_template, redirect, url_for, flash, session, Blueprint,
 from datetime import datetime
 import plotly.express as px
 import plotly.io as pio
+from flask_login import current_user
 from app.models import User
-from app.utils import login_required
+from app.utils import role_required
 from app import db
 from app.controllers import search_service_requests
 
@@ -11,10 +12,9 @@ professional_view_bp = Blueprint("professional", __name__, url_prefix="/professi
 
 
 @professional_view_bp.route("/home")
-@login_required("professional")
+@role_required("professional")
 def home():
-    print(session["user"])
-    professional = User.get_user(session["user"]).professional_details
+    professional = User.get_user(current_user.id).professional_details
     service_requests = search_service_requests(professional_details_id=professional.id)
     todays_services, upcoming_services = [], []
     # todays date
@@ -38,7 +38,7 @@ def home():
 
 
 @professional_view_bp.route("/search", methods=["GET", "POST"])
-@login_required("professional")
+@role_required("professional")
 def search():
     if request.method == "POST":
         search_query = request.form["search_query"]
@@ -67,11 +67,11 @@ def search():
 
 
 @professional_view_bp.route("/summary")
-@login_required("professional")
+@role_required("professional")
 def summary():
     customer_ratings = {i: 0 for i in range(6)}
     all_service_requests = search_service_requests(
-        professional_details_id=session["user"]
+        professional_details_id=current_user.id
     )
     for service_request in all_service_requests:
         if service_request.rating:
@@ -89,7 +89,7 @@ def summary():
 
 
 @professional_view_bp.route("/accept_service/<int:id>")
-@login_required("professional")
+@role_required("professional")
 def accept_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Accepted"
@@ -99,7 +99,7 @@ def accept_service_request(id):
 
 
 @professional_view_bp.route("/reject_service/<int:id>")
-@login_required("professional")
+@role_required("professional")
 def reject_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Rejected"
@@ -110,7 +110,7 @@ def reject_service_request(id):
 
 # close the service request
 @professional_view_bp.route("/close_service/<int:id>")
-@login_required("professional")
+@role_required("professional")
 def close_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Completed"
@@ -120,7 +120,7 @@ def close_service_request(id):
 
 
 @professional_view_bp.route("/cancel_service/<int:id>")
-@login_required("professional")
+@role_required("professional")
 def cancel_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Cancelled"
@@ -130,7 +130,7 @@ def cancel_service_request(id):
 
 
 @professional_view_bp.route("/toggle_issue/<int:id>", methods=["POST"])
-@login_required("customer")
+@role_required("customer")
 def toggle_issue(id):
     service_request = search_service_requests(id=id)
     service_request.prof_issue_raised = not service_request.prof_issue_raised

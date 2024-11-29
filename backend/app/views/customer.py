@@ -7,11 +7,12 @@ from flask import (
     session,
     Blueprint,
 )
+from flask_login import current_user
 from datetime import datetime
 import plotly.express as px
 import plotly.io as pio
 from app.models import Service
-from app.utils import login_required
+from app.utils import role_required
 from app import db
 from app.controllers import (
     search_professional,
@@ -26,10 +27,10 @@ customer_view_bp = Blueprint("customer", __name__, url_prefix="/customer")
 
 
 @customer_view_bp.route("/home", methods=["GET"])
-@login_required("customer")
+@role_required("customer")
 def home():
     service_id = request.args.get("service")
-    request_history = search_service_requests(customer_id=session["user"])
+    request_history = search_service_requests(customer_id=current_user.id)
     if service_id and service_id != "all":
 
         # get ProfessionalDetails for the selected service that are approved
@@ -51,7 +52,7 @@ def home():
 
 
 @customer_view_bp.route("/search", methods=["GET", "POST"])
-@login_required("customer")
+@role_required("customer")
 def search():
     if request.method == "POST":
         search_query = request.form.get("search_query")
@@ -84,9 +85,9 @@ def search():
 
 
 @customer_view_bp.route("/summary")
-@login_required("customer")
+@role_required("customer")
 def summary():
-    all_service_requests = search_service_requests(customer_id=session["user"])
+    all_service_requests = search_service_requests(customer_id=current_user.id)
 
     status_count = {}
     for service_request in all_service_requests:
@@ -108,14 +109,14 @@ def summary():
 
 
 @customer_view_bp.route("/book/<int:id>", methods=["GET", "POST"])
-@login_required("customer")
+@role_required("customer")
 def book_service(id):
 
     if request.method == "POST":
         service_date = request.form.get("service_date")
         service_date = datetime.strptime(service_date, "%Y-%m-%d")
         stat, msg = create_service_request(
-            customer_id=session["user"],
+            customer_id=current_user.id,
             professional_details_id=id,
             date_of_service=service_date,
             remarks=request.form.get("remarks"),
@@ -132,7 +133,7 @@ def book_service(id):
 
 # submit_review
 @customer_view_bp.route("/submit_review/<int:id>", methods=["POST"])
-@login_required("customer")
+@role_required("customer")
 def submit_review(id):
     stat, msg = rate_and_review(
         service_request_id=id,
@@ -146,7 +147,7 @@ def submit_review(id):
 
 
 @customer_view_bp.route("/close_service/<int:id>")
-@login_required("customer")
+@role_required("customer")
 def close_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Completed"
@@ -156,7 +157,7 @@ def close_service_request(id):
 
 
 @customer_view_bp.route("/cancel_service/<int:id>")
-@login_required("customer")
+@role_required("customer")
 def cancel_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Cancelled"
@@ -166,7 +167,7 @@ def cancel_service_request(id):
 
 
 @customer_view_bp.route("/toggle_issue/<int:id>", methods=["POST"])
-@login_required("customer")
+@role_required("customer")
 def toggle_issue(id):
     service_request = search_service_requests(id=id)
     service_request.cust_issue_raised = not service_request.cust_issue_raised

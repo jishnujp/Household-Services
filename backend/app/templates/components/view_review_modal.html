@@ -39,6 +39,29 @@
                 {% endif %}
                 <hr>
                 <p><strong>Service Status: </strong>{{ request.status }}</p>
+                {% if session['role'] == 'customer' %}
+                <form action="{{ url_for('customer.toggle_issue', id=request.id)}}" method="POST">
+                    {% if request.cust_issue_raised %}
+                    <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Close Issue</button>
+                    {% else %}
+                    <button type="submit" class="btn btn-warning" data-bs-dismiss="modal">Raise Issue</button>
+                    {% endif %}
+                </form>
+                {% elif session['role'] == 'professional' %}
+                <form action="{{ url_for('professional.toggle_issue', id=request.id)}}" method="POST">
+                    {% if request.prof_issue_raised %}
+                    <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Close Issue</button>
+                    {% else %}
+                    <button type="submit" class="btn btn-warning" data-bs-dismiss="modal">Raise Issue</button>
+                    {% endif %}
+                </form>
+                {% elif session['role'] == 'admin' %}
+                {% if request.cust_issue_raised or request.prof_issue_raised %}
+                <h3 class="fs-5">Issue</h3>
+                <p><strong>Issue raised by customer: </strong>{{ request.cust_issue_raised }}</p>
+                <p><strong>Issue raised by professional: </strong>{{ request.prof_issue_raised }}</p>
+                {% endif %}
+                {% endif %}
                 {% if request.status == 'Completed' %}
                 <h3 class="fs-5">Review</h3>
                 <form action="{{ url_for('customer.submit_review', id=request.id) }}" method="POST">
@@ -73,31 +96,6 @@
                         href="{{ url_for('customer.submit_review', id=request.id) }}">Save changes</button>
                     {% endif %}
                 </form>
-                {% endif %}
-
-
-                {% if session['role'] == 'customer' %}
-                <form action="{{ url_for('customer.toggle_issue', id=request.id)}}" method="POST">
-                    {% if request.cust_issue_raised %}
-                    <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Close Issue</button>
-                    {% else %}
-                    <button type="submit" class="btn btn-warning" data-bs-dismiss="modal">Raise Issue</button>
-                    {% endif %}
-                </form>
-                {% elif session['role'] == 'professional' %}
-                <form action="{{ url_for('professional.toggle_issue', id=request.id)}}" method="POST">
-                    {% if request.prof_issue_raised %}
-                    <button type="submit" class="btn btn-danger" data-bs-dismiss="modal">Close Issue</button>
-                    {% else %}
-                    <button type="submit" class="btn btn-warning" data-bs-dismiss="modal">Raise Issue</button>
-                    {% endif %}
-                </form>
-                {% else %}
-                {% if request.cust_issue_raised or request.prof_issue_raised %}
-                <h3 class="fs-5">Issue</h3>
-                <p><strong>Issue raised by customer: </strong>{{ request.cust_issue_raised }}</p>
-                <p><strong>Issue raised by professional: </strong>{{ request.prof_issue_raised }}</p>
-                {% endif %}
                 {% endif %}
 
                 <div class="modal-footer">
