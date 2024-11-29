@@ -37,9 +37,9 @@ class User(BaseModel, UserMixin):
 
         professional_role = Role.query.filter_by(name="professional").first()
 
-        if not User.get_user(os.getenv("ADMIN_USERNAME", "admin@admin")):
+        if not User.get_user(os.getenv("ADMIN_USERNAME", "admin@household.com")):
             admin_user = User(
-                username=os.getenv("ADMIN_USERNAME", "admin@admin"),
+                username=os.getenv("ADMIN_USERNAME", "admin@household.com"),
                 password=os.getenv("ADMIN_PASSWORD", "Admin123"),
                 roles=[admin_role, professional_role],
             )

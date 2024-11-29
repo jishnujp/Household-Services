@@ -18,6 +18,7 @@ from app.controllers import (
     create_professional,
     search_service,
 )
+from app.forms import LoginForm
 
 
 public_view_bp = Blueprint("public", __name__, url_prefix="/")
@@ -37,41 +38,39 @@ def home():
 # Login route
 @public_view_bp.route("/login", methods=["GET", "POST"])
 def login():
-    print(current_user)
-    if request.method == "POST":
-        messages = []
-        username = request.form.get("username")
-        password = request.form.get("password")
-        chosen_role = request.form.get("role")
+    form = LoginForm()
 
-        if not username:
-            messages.append("Username is required")
-        if not password:
-            messages.append("Password is required")
+    if form.validate_on_submit():
+        messages = []
+        username = form.username.data
+        password = form.password.data
+        chosen_role = form.role.data
 
         user = User.query.filter_by(username=username).first()
-        if not user:
-            messages.append("User not found")
-        elif user.password != password:
-            messages.append("Incorrect password")
-        elif user.is_deactivated:
-            messages.append("User is blocked, contact admin")
-        elif chosen_role not in [role.name for role in user.roles]:
-            messages.append("You are not authorized to access this role")
 
-        if messages:
-            for message in messages:
-                flash(message, "danger")
+        if not user:
+            flash("User not found", "danger")
+            return redirect(url_for("public.login"))
+        elif user.password != password:
+            flash("Incorrect password", "danger")
+            return redirect(url_for("public.login"))
+        elif user.is_deactivated:
+            flash("User is blocked, contact admin", "danger")
+            return redirect(url_for("public.login"))
+        elif chosen_role not in [role.name for role in user.roles]:
+            flash("You are not authorized to access this role", "danger")
             return redirect(url_for("public.login"))
 
         # Successful login
-        print(user)
         login_user(user)
         session["role"] = chosen_role
         flash("Login successful", "success")
         return redirect(url_for(f"{chosen_role}.home"))
+    else:
+        print("Form not validated")
+        print(form.errors)
 
-    return render_template("login.html")
+    return render_template("login.html", form=form)
 
 
 # Logout route
