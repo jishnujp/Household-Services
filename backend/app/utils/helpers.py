@@ -2,7 +2,6 @@ from hashlib import md5
 from flask import redirect, url_for, abort
 from flask_login import current_user
 from functools import wraps
-from app.models import User
 
 
 def hash_file_object(file_object):

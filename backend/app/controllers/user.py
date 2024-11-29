@@ -3,6 +3,7 @@ from app import db
 from sqlalchemy import or_
 from app.models import User, Role
 from app.controllers.commons import save_image
+from app.utils.constants import AllowableRoles
 
 
 def create_customer(data: dict):
@@ -16,7 +17,7 @@ def create_customer(data: dict):
         profile_name = "default.jpg"
 
     if len(data.get("role", [])) == 0:
-        data["role"] = [Role.query.filter_by(name="customer").first()]
+        data["role"] = [Role.query.filter_by(name=AllowableRoles.CUSTOMER).first()]
 
     new_user = User(
         username=data["username"],

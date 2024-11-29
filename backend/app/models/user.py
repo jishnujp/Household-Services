@@ -3,6 +3,7 @@ import os
 from flask_login import UserMixin
 from app import db
 from app.models.base_model import BaseModel
+from app.utils.constants import AllowableRoles
 
 
 class User(BaseModel, UserMixin):
@@ -30,12 +31,14 @@ class User(BaseModel, UserMixin):
         """Create admin user if not exist."""
         from app.models.role import Role
 
-        admin_role = Role.query.filter_by(name="admin").first()
+        admin_role = Role.query.filter_by(name=AllowableRoles.ADMIN).first()
         if not admin_role:
             Role.create_default_roles()
-            admin_role = Role.query.filter_by(name="admin").first()
+            admin_role = Role.query.filter_by(name=AllowableRoles.ADMIN).first()
 
-        professional_role = Role.query.filter_by(name="professional").first()
+        professional_role = Role.query.filter_by(
+            name=AllowableRoles.PROFESSIONAL
+        ).first()
 
         if not User.get_user(os.getenv("ADMIN_USERNAME", "admin@household.com")):
             admin_user = User(

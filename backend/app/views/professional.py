@@ -7,12 +7,15 @@ from app.models import User
 from app.utils import role_required
 from app import db
 from app.controllers import search_service_requests
+from app.utils.constants import AllowableRoles
 
-professional_view_bp = Blueprint("professional", __name__, url_prefix="/professional")
+professional_view_bp = Blueprint(
+    AllowableRoles.PROFESSIONAL, __name__, url_prefix="/professional"
+)
 
 
 @professional_view_bp.route("/home")
-@role_required("professional")
+@role_required(AllowableRoles.PROFESSIONAL)
 def home():
     professional = User.get_user(current_user.id).professional_details
     service_requests = search_service_requests(professional_details_id=professional.id)
@@ -38,7 +41,7 @@ def home():
 
 
 @professional_view_bp.route("/search", methods=["GET", "POST"])
-@role_required("professional")
+@role_required(AllowableRoles.PROFESSIONAL)
 def search():
     if request.method == "POST":
         search_query = request.form["search_query"]
@@ -67,7 +70,7 @@ def search():
 
 
 @professional_view_bp.route("/summary")
-@role_required("professional")
+@role_required(AllowableRoles.PROFESSIONAL)
 def summary():
     customer_ratings = {i: 0 for i in range(6)}
     all_service_requests = search_service_requests(
@@ -89,7 +92,7 @@ def summary():
 
 
 @professional_view_bp.route("/accept_service/<int:id>")
-@role_required("professional")
+@role_required(AllowableRoles.PROFESSIONAL)
 def accept_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Accepted"
@@ -99,7 +102,7 @@ def accept_service_request(id):
 
 
 @professional_view_bp.route("/reject_service/<int:id>")
-@role_required("professional")
+@role_required(AllowableRoles.PROFESSIONAL)
 def reject_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Rejected"
@@ -110,7 +113,7 @@ def reject_service_request(id):
 
 # close the service request
 @professional_view_bp.route("/close_service/<int:id>")
-@role_required("professional")
+@role_required(AllowableRoles.PROFESSIONAL)
 def close_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Completed"
@@ -120,7 +123,7 @@ def close_service_request(id):
 
 
 @professional_view_bp.route("/cancel_service/<int:id>")
-@role_required("professional")
+@role_required(AllowableRoles.PROFESSIONAL)
 def cancel_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Cancelled"
@@ -130,7 +133,7 @@ def cancel_service_request(id):
 
 
 @professional_view_bp.route("/toggle_issue/<int:id>", methods=["POST"])
-@role_required("customer")
+@role_required(AllowableRoles.CUSTOMER)
 def toggle_issue(id):
     service_request = search_service_requests(id=id)
     service_request.prof_issue_raised = not service_request.prof_issue_raised

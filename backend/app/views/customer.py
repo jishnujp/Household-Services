@@ -14,6 +14,7 @@ import plotly.io as pio
 from app.models import Service
 from app.utils import role_required
 from app import db
+from app.utils.constants import AllowableRoles
 from app.controllers import (
     search_professional,
     search_service,
@@ -23,11 +24,11 @@ from app.controllers import (
 )
 
 
-customer_view_bp = Blueprint("customer", __name__, url_prefix="/customer")
+customer_view_bp = Blueprint(AllowableRoles.CUSTOMER, __name__, url_prefix="/customer")
 
 
 @customer_view_bp.route("/home", methods=["GET"])
-@role_required("customer")
+@role_required(AllowableRoles.CUSTOMER)
 def home():
     service_id = request.args.get("service")
     request_history = search_service_requests(customer_id=current_user.id)
@@ -52,7 +53,7 @@ def home():
 
 
 @customer_view_bp.route("/search", methods=["GET", "POST"])
-@role_required("customer")
+@role_required(AllowableRoles.CUSTOMER)
 def search():
     if request.method == "POST":
         search_query = request.form.get("search_query")
@@ -85,7 +86,7 @@ def search():
 
 
 @customer_view_bp.route("/summary")
-@role_required("customer")
+@role_required(AllowableRoles.CUSTOMER)
 def summary():
     all_service_requests = search_service_requests(customer_id=current_user.id)
 
@@ -109,7 +110,7 @@ def summary():
 
 
 @customer_view_bp.route("/book/<int:id>", methods=["GET", "POST"])
-@role_required("customer")
+@role_required(AllowableRoles.CUSTOMER)
 def book_service(id):
 
     if request.method == "POST":
@@ -133,7 +134,7 @@ def book_service(id):
 
 # submit_review
 @customer_view_bp.route("/submit_review/<int:id>", methods=["POST"])
-@role_required("customer")
+@role_required(AllowableRoles.CUSTOMER)
 def submit_review(id):
     stat, msg = rate_and_review(
         service_request_id=id,
@@ -147,7 +148,7 @@ def submit_review(id):
 
 
 @customer_view_bp.route("/close_service/<int:id>")
-@role_required("customer")
+@role_required(AllowableRoles.CUSTOMER)
 def close_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Completed"
@@ -157,7 +158,7 @@ def close_service_request(id):
 
 
 @customer_view_bp.route("/cancel_service/<int:id>")
-@role_required("customer")
+@role_required(AllowableRoles.CUSTOMER)
 def cancel_service_request(id):
     service_request = search_service_requests(id=id)
     service_request.status = "Cancelled"
@@ -167,7 +168,7 @@ def cancel_service_request(id):
 
 
 @customer_view_bp.route("/toggle_issue/<int:id>", methods=["POST"])
-@role_required("customer")
+@role_required(AllowableRoles.CUSTOMER)
 def toggle_issue(id):
     service_request = search_service_requests(id=id)
     service_request.cust_issue_raised = not service_request.cust_issue_raised

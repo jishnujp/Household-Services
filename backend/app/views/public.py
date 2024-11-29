@@ -19,6 +19,7 @@ from app.controllers import (
     search_service,
 )
 from app.forms import LoginForm
+from app.utils.constants import AllowableRoles
 
 
 public_view_bp = Blueprint("public", __name__, url_prefix="/")
@@ -90,9 +91,9 @@ def about():
 
 @public_view_bp.route("/register/<role>", methods=["GET", "POST"])
 def register(role):
-    if role not in ["customer", "professional"]:
+    if role not in [AllowableRoles.CUSTOMER, AllowableRoles.PROFESSIONAL]:
         flash(f"Invalid role: {role}", "danger")
-        return redirect(url_for("public.register", role="customer"))
+        return redirect(url_for("public.register", role=AllowableRoles.CUSTOMER))
     messages = []
     if request.method == "POST":
         print("Registering")
@@ -113,9 +114,9 @@ def register(role):
             file = request.files.get(key)
             if file:
                 data[key] = file
-        if role == "professional":
+        if role == AllowableRoles.PROFESSIONAL:
             new_user = create_professional(data)
-        elif role == "customer":
+        elif role == AllowableRoles.CUSTOMER:
             new_user = create_customer(data)
         if new_user:
             flash("User created successfully", "success")
@@ -125,7 +126,7 @@ def register(role):
             return redirect(url_for("public.register", role=role))
 
     elif request.method == "GET":
-        if role == "professional":
+        if role == AllowableRoles.PROFESSIONAL:
             services = search_service()
             return render_template(
                 "register.html", role=role, available_services=services

@@ -1,6 +1,7 @@
 from app import create_app, db
 from app.config import Config
 from app.models import User, Role, Service, ProfessionalDetails
+from app.utils.constants import AllowableRoles
 import requests
 import os
 
@@ -62,8 +63,8 @@ db.session.commit()
 
 
 # Create sample Users
-professional_role = Role.query.filter_by(name="professional").first()
-customer_role = Role.query.filter_by(name="customer").first()
+professional_role = Role.query.filter_by(name=AllowableRoles.PROFESSIONAL).first()
+customer_role = Role.query.filter_by(name=AllowableRoles.CUSTOMER).first()
 
 users = [
     {

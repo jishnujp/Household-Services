@@ -3,6 +3,7 @@ from sqlalchemy import or_
 from app import db
 from app.models import User, Role, ProfessionalDetails, Service
 from app.controllers.commons import save_file
+from app.utils.constants import AllowableRoles
 
 
 def create_professional(data: dict):
@@ -17,8 +18,8 @@ def create_professional(data: dict):
         raise Exception("Invalid service id")
     # add user
     data["role"] = [
-        Role.query.filter_by(name="professional").first(),
-        Role.query.filter_by(name="customer").first(),
+        Role.query.filter_by(name=AllowableRoles.PROFESSIONAL).first(),
+        Role.query.filter_by(name=AllowableRoles.CUSTOMER).first(),
     ]
     new_user = create_customer(data)
     professional_details = ProfessionalDetails(
