@@ -7,7 +7,7 @@ from app.models import User
 from app.utils import role_required
 from app import db
 from app.controllers import search_service_requests
-from app.utils.constants import AllowableRoles
+from app.utils.constants import AllowableRoles, ServiceRequestStatus
 
 professional_view_bp = Blueprint(
     AllowableRoles.PROFESSIONAL, __name__, url_prefix="/professional"
@@ -29,7 +29,9 @@ def home():
         elif service.date_of_service > today.date():
             upcoming_services.append(service)
     completed_services = [
-        service for service in service_requests if service.status == "Completed"
+        service
+        for service in service_requests
+        if service.status == ServiceRequestStatus.COMPLETED
     ]
     return render_template(
         "professional/home.html",
@@ -95,7 +97,7 @@ def summary():
 @role_required(AllowableRoles.PROFESSIONAL)
 def accept_service_request(id):
     service_request = search_service_requests(id=id)
-    service_request.status = "Accepted"
+    service_request.status = ServiceRequestStatus.ACCEPTED
     db.session.commit()
     flash("Service accepted", "success")
     return redirect(url_for("professional.home"))
@@ -105,7 +107,7 @@ def accept_service_request(id):
 @role_required(AllowableRoles.PROFESSIONAL)
 def reject_service_request(id):
     service_request = search_service_requests(id=id)
-    service_request.status = "Rejected"
+    service_request.status = ServiceRequestStatus.REJECTED
     db.session.commit()
     flash("Service rejected", "success")
     return redirect(url_for("professional.home"))
@@ -116,7 +118,7 @@ def reject_service_request(id):
 @role_required(AllowableRoles.PROFESSIONAL)
 def close_service_request(id):
     service_request = search_service_requests(id=id)
-    service_request.status = "Completed"
+    service_request.status = ServiceRequestStatus.COMPLETED
     db.session.commit()
     flash("Service Closed", "success")
     return redirect(url_for("professional.home"))

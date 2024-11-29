@@ -14,7 +14,7 @@ import plotly.io as pio
 from app.models import Service
 from app.utils import role_required
 from app import db
-from app.utils.constants import AllowableRoles
+from app.utils.constants import AllowableRoles, ServiceRequestStatus
 from app.controllers import (
     search_professional,
     search_service,
@@ -151,7 +151,7 @@ def submit_review(id):
 @role_required(AllowableRoles.CUSTOMER)
 def close_service_request(id):
     service_request = search_service_requests(id=id)
-    service_request.status = "Completed"
+    service_request.status = ServiceRequestStatus.COMPLETED
     db.session.commit()
     flash("Service Closed", "success")
     return redirect(url_for("customer.home"))
