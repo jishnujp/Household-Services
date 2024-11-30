@@ -86,7 +86,6 @@ def summary():
     rating_fig = px.bar(
         x=list(customer_ratings.keys()),
         y=list(customer_ratings.values()),
-        title="Customer Ratings",
         labels={"x": "Rating", "y": "Count"},
     )
     rating_fig = pio.to_html(rating_fig)

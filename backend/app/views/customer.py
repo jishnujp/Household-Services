@@ -100,7 +100,6 @@ def summary():
     status_fig = px.pie(
         values=list(status_count.values()),
         names=list(status_count.keys()),
-        title="Service Request Status",
     )
 
     status_plot_html = pio.to_html(status_fig, full_html=False)

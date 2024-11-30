@@ -244,7 +244,6 @@ def summary():
     rating_fig = px.bar(
         x=list(customer_ratings.keys()),
         y=list(customer_ratings.values()),
-        title="Customer Ratings",
         labels={"x": "Rating", "y": "Count"},
     )
 
@@ -258,7 +257,6 @@ def summary():
     status_fig = px.pie(
         values=list(status_count.values()),
         names=list(status_count.keys()),
-        title="Service Request Status",
     )
 
     # get html of the plots
