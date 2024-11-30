@@ -109,7 +109,6 @@
             <th>Contact Number</th>
             <th>Location</th>
             <th>Date</th>
-            <th>Rating</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -125,7 +124,6 @@
         <td>{{ request.user.phone }}</td>
         <td>{{ request.user.address }} <br>Pincode: {{ request.user.pincode }} </td>
         <td>{{ request.date_of_service }}</td>
-        <td>{{ request.rating }}</td>
         <td>
             {% include 'components/view_review_modal.html' %}
             <br>
