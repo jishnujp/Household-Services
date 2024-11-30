@@ -58,7 +58,7 @@ def approve_professional(id):
     stat, msg = activate_professional(id)
     color = "success" if stat else "danger"
     flash(msg, color)
-    return redirect(url_for("admin.home"))
+    return redirect(request.referrer or url_for("admin.home"))
 
 
 @admin_view_bp.route("/block_professional/<int:id>")
@@ -67,7 +67,7 @@ def block_professional(id):
     professional = ProfessionalDetails.query.get(id)
     professional.deactivate()
     flash("Professional blocked", "success")
-    return redirect(url_for("admin.home"))
+    return redirect(request.referrer or url_for("admin.home"))
 
 
 @admin_view_bp.route("/view_professional/<int:id>")
@@ -83,7 +83,7 @@ def activate_user(id):
     user = search_user(with_deactivated=True, id=id)
     user.activate()
     flash("User activated successfully", "success")
-    return redirect(url_for("admin.home"))
+    return redirect(request.referrer or url_for("admin.home"))
 
 
 @admin_view_bp.route("/deactivate_user/<int:id>")
@@ -92,7 +92,7 @@ def deactivate_user(id):
     user = search_user(id=id)
     user.deactivate()
     flash("User deactivated successfully", "success")
-    return redirect(url_for("admin.home"))
+    return redirect(request.referrer or url_for("admin.home"))
 
 
 @admin_view_bp.route("/edit_service/<int:id>", methods=["GET", "POST"])
