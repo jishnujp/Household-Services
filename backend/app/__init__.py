@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from app.config import Config
+from flask_restful import Api
 from flask_login import LoginManager
 
 
@@ -20,6 +21,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    api = Api(app)
 
     login_manager.login_view = "public.login"
     login_manager.login_message = "Please log in to access this page"
@@ -47,6 +49,10 @@ def create_app(config_class=Config):
     app.register_blueprint(admin_view_bp)
     app.register_blueprint(customer_view_bp)
     app.register_blueprint(professional_view_bp)
+
+    from app.routes import public_api_bp
+
+    app.register_blueprint(public_api_bp, url_prefix="/api")
 
     @app.errorhandler(500)
     def internal_error(error):
