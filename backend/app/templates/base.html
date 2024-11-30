@@ -12,7 +12,12 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="description" content="{% block description %}{% endblock %}">
     <title>{% block title %}{% endblock %}</title>
-
+    <style>
+        .flash-message {
+            transition: opacity 0.5s ease-out;
+        }
+    </style>
+    {% block css %}{% endblock %}
 </head>
 
 <body>
@@ -24,7 +29,7 @@
         {% if messages %}
         <div class="container position-fixed top-0 end-0 p-3" style="z-index: 1050; width: 25%;">
             {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <div class="alert alert-{{ category }} alert-dismissible fade show flash-message" role="alert">
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -44,6 +49,21 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const flashMessages = document.querySelectorAll('.flash-message');
+
+            flashMessages.forEach(function (message) {
+                setTimeout(function () {
+                    message.classList.add('fade');
+                    setTimeout(function () {
+                        message.remove();
+                    }, 500);  // Wait for the fade transition to complete (500ms)
+                }, 1000);  // Delay before fading out (1000ms = 1 second)
+            });
+        });
+    </script>
     {% block script %}{% endblock %}
 
 </body>
