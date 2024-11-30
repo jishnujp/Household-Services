@@ -29,7 +29,11 @@
     {% for request in todays_services %}
     <tr class="{% if request.prof_issue_raised %}table-danger{% endif %}">
         <td>{{ request.id }}</td>
-        <td>{{ request.user.full_name }}</td>
+        <td>
+            {% set user = request.user %}
+            {% set modal_trigger_type = 'link' %}
+            {% include 'components/view_user_modal.html' %}
+        </td>
         <td>{{ request.user.phone }}</td>
         <td>{{ request.user.address }} <br>Pincode: {{ request.user.pincode }} </td>
         <td>
@@ -64,7 +68,12 @@
     {% for request in upcoming_services %}
     <tr class="{% if request.prof_issue_raised %}table-danger{% endif %}">
         <td>{{ request.id }}</td>
-        <td>{{ request.user.full_name }}</td>
+        <td>
+            {% set user = request.user %}
+            {% set modal_trigger_type = 'link' %}
+            {% include 'components/view_user_modal.html' %}
+
+        </td>
         <td>{{ request.user.phone }}</td>
         <td>{{ request.user.address }} <br>Pincode: {{ request.user.pincode }} </td>
         <td>
@@ -107,14 +116,27 @@
     {% for request in completed_services %}
     <tr class="{% if request.prof_issue_raised %}table-danger{% endif %}">
         <td>{{ request.id }}</td>
-        <td>{{ request.user.full_name }}</td>
+        <td>
+            {% set user = request.user %}
+            {% set modal_trigger_type = 'link' %}
+            {% include 'components/view_user_modal.html' %}
+
+        </td>
         <td>{{ request.user.phone }}</td>
         <td>{{ request.user.address }} <br>Pincode: {{ request.user.pincode }} </td>
         <td>{{ request.date_of_service }}</td>
-        <td>{{ request.review }}</td>
         <td>{{ request.rating }}</td>
         <td>
             {% include 'components/view_review_modal.html' %}
+            <br>
+            <div class="star-rating">
+                {% for i in range(5, 0, -1) %}
+                <input type="radio" name="rating" id="{{request.id}}-star{{ i }}" value="{{ i }}" {% if
+                    request.rating==i %} checked {% endif %} disabled>
+                <label for="{{request.id}}-star{{ i }}" class="bi bi-star-fill"></label>
+                {% endfor %}
+
+            </div>
         </td>
     </tr>
     {% endfor %}

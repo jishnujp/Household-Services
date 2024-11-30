@@ -1,8 +1,15 @@
 <!-- Button to trigger modal -->
+{% if modal_trigger_type == 'link' %}
+<a href="#" class="text-primary text-decoration-none shadow-sm hover-link" data-bs-toggle="modal"
+    data-bs-target="#professionalDetailsModal-{{ professional.id }}">
+    {{ professional.business_name }}
+</a>
+{% else %}
 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
     data-bs-target="#professionalDetailsModal-{{ professional.id }}">
     View
 </button>
+{% endif %}
 
 
 <!-- Modal -->

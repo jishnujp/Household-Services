@@ -56,8 +56,9 @@
                 <td>{{ request.id }}</td>
                 <td>{{ request.created_at.date() }}</td>
                 <td>{{ request.date_of_service }}</td>
-                <td>{{ request.user.username }}
+                <td>
                     {% set user = request.user %}
+                    {% set modal_trigger_type = 'link' %}
                     {% include 'components/view_user_modal.html' %}
                 </td>
                 <td>

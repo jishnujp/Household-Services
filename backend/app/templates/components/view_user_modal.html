@@ -1,11 +1,18 @@
 <!-- Button to trigger modal -->
+{% if modal_trigger_type == 'link' %}
+<a href="#" class="text-primary text-decoration-none shadow-sm hover-link" data-bs-toggle="modal"
+    data-bs-target="#userDetailsModal-{{ user.id }}">
+    {{ user.full_name }}
+</a>
+{% else %}
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userDetailsModal-{{ user.id }}">
     View
 </button>
+{% endif %}
 
 
 <!-- Modal -->
-<div class="modal fade" id="userDetailsModal-{{ user.id }}" tabindex="-1"
+<div class=" modal fade" id="userDetailsModal-{{ user.id }}" tabindex="-1"
     aria-labelledby="userDetailsModalLabel-{{ user.id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

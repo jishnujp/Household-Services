@@ -13,8 +13,32 @@
     <meta name="description" content="{% block description %}{% endblock %}">
     <title>{% block title %}{% endblock %}</title>
     <style>
+        .hover-link:hover {
+            font-weight: bold;
+        }
+
         .flash-message {
             transition: opacity 0.5s ease-out;
+        }
+
+        .star-rating {
+            direction: rtl;
+            display: inline-flex;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 1.5rem;
+            color: #ddd;
+        }
+
+        .star-rating input:checked~label,
+        .star-rating label:hover,
+        .star-rating label:hover~label {
+            color: #ffc107;
         }
     </style>
     {% block css %}{% endblock %}

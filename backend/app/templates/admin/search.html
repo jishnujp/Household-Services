@@ -168,7 +168,6 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Requested date</th>
                 <th>Service Date</th>
                 <th>Cutomer</th>
                 <th>Professional</th>
@@ -180,14 +179,15 @@
             {% for request in service_requests %}
             <tr class="{% if request.cust_issue_raised or request.prof_issue_raised %}table-danger{% endif %}">
                 <td>{{ request.id }}</td>
-                <td>{{ request.created_at.date() }}</td>
                 <td>{{ request.date_of_service }}</td>
-                <td>{{ request.user.username }}
+                <td>
                     {% set user = request.user %}
+                    {% set modal_trigger_type = 'link' %}
                     {% include 'components/view_user_modal.html' %}
                 </td>
-                <td>{{ request.professional_details.user.username }}
+                <td>
                     {% set professional = request.professional_details %}
+                    {% set modal_trigger_type = 'link' %}
                     {% include 'components/view_professional_modal.html' %}
                 <td>
                     <div class="badge {% if request.status == 'Pending' %}text-bg-warning

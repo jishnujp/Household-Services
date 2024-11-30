@@ -45,7 +45,9 @@
                 <tr>
                     <th>Username</th>
                     <th>Profile</th>
+                    <th>Address</th>
                     <th>Experience</th>
+                    <th>Price</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -55,7 +57,14 @@
                     <td>{{ professional.user.username }}</td>
                     <td><img src="{{ url_for('public.uploaded_image', filename=professional.user.profile_pic) }}"
                             alt="{{ professional.name }}" width="100" height="100"></td>
+                    <td>
+                        {{ professional.user.address }}<br>
+                        pin: {{ professional.user.pincode }}<br>
+                        ph: {{ professional.user.phone }}
+
+                    </td>
                     <td>{{ professional.experience }}</td>
+                    <td>₹{{professional.service.base_price + professional.extra_price }}</td>
                     <td>
                         <a href="{{ url_for('customer.book_service', id=professional.id) }}"
                             class="btn btn-success">Book
