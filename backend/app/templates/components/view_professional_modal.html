@@ -47,8 +47,26 @@
                             professional.document }}</a></p>
                     <embed src="{{ url_for('public.uploaded_file', filename=professional.document) }}"
                         type="application/pdf" width="100%" height="600px" />
-                    <p><strong>Extra Price:</strong> ₹{{ professional.extra_price }}</p>
-                    <p><strong>Approved:</strong> {{ 'No' if professional.is_deactivated else 'Yes' }}</p>
+                    <p><strong>Total Price:</strong> ₹{{professional.service.base_price + professional.extra_price }}
+                    <p>(<i>Base Price:</i> ₹{{ professional.service.base_price }};
+                        <i>Premium:</i> ₹{{ professional.extra_price }})
+                    </p>
+                    </p>
+                    {% if session['role'] == 'admin' %}
+                    <p style="display: inline;"><strong>Status:</strong>
+                    <div class="badge {% if professional.is_deactivated %}bg-danger{% else %}bg-success{% endif %}">
+                        {{ 'Inactive' if professional.is_deactivated else 'Active' }}
+
+                    </div>
+                    </p>
+                    {% if professional.is_deactivated == True %}
+                    <a href="{{ url_for('admin.approve_professional', id=professional.id) }}"
+                        class="btn btn-success">Activate</a>
+                    {% else %}
+                    <a href="{{ url_for('admin.block_professional', id=professional.id) }}"
+                        class="btn btn-danger">deactivate</a>
+                    {% endif %}
+                    {% endif %}
                 </div>
             </div>
             <div class="modal-footer">

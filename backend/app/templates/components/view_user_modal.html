@@ -28,6 +28,15 @@
                             <p><strong>Address:</strong> {{ user.address }}</p>
                             <p><strong>Pincode:</strong> {{ user.pincode }}</p>
                             <p><strong>Phone:</strong> {{ user.phone }}</p>
+                            {% if session['role'] == 'admin' %}
+                            {% if user.is_deactivated %}
+                            <a href="{{ url_for('admin.activate_user', id=user.id) }}"
+                                class="btn btn-success">Activate</a>
+                            {% else %}
+                            <a href="{{ url_for('admin.deactivate_user', id=user.id) }}"
+                                class="btn btn-danger">Deactivate</a>
+                            {% endif %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
