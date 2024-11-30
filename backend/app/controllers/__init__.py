@@ -1,4 +1,4 @@
-from .user import create_customer, search_user
+from .user import create_customer, search_user, update_user
 from .professional import (
     create_professional,
     search_professional,

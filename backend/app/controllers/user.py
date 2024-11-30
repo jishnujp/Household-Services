@@ -69,3 +69,32 @@ def search_user(with_deactivated=False, **kwargs):
     print("With deactivated", with_deactivated)
 
     return User.query.with_deactivated(with_deactivated).filter(or_(*filters)).all()
+
+
+def update_user(user_id, data):
+    print(data)
+    user = User.query.get(user_id)
+    if not user:
+        raise Exception("User not found")
+    if "role" in data:
+        data["role"] = [Role.query.get(role_id) for role_id in data["role"]]
+    if "profile_pic" in data:
+        profile_pic = data.get("profile_pic")
+        if profile_pic:
+            profile_name = save_image(profile_pic)
+            data["profile_pic"] = profile_name
+    for key, value in data.items():
+        if key in [
+            "id",
+            "created_at",
+            "updated_at",
+            "deactivate_at",
+            "username",
+            "full_name",
+        ]:
+            continue
+        if hasattr(user, key):
+            setattr(user, key, value)
+
+    db.session.commit()
+    return user

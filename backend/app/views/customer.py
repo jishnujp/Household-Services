@@ -21,6 +21,7 @@ from app.controllers import (
     create_service_request,
     search_service_requests,
     rate_and_review,
+    update_user,
 )
 
 
@@ -195,3 +196,50 @@ def toggle_issue(id):
     db.session.commit()
     flash("Issue Raised", "success")
     return redirect(url_for("customer.home"))
+
+
+@customer_view_bp.route("/edit_profile", methods=["GET", "POST"])
+@role_required(AllowableRoles.CUSTOMER)
+def edit_profile():
+    if request.method == "POST":
+        password = request.form.get("password")
+        # check if password is correct
+        if not current_user.check_password(password):
+            flash("Incorrect Password", "danger")
+            return redirect(url_for("customer.edit_profile"))
+        data = request.form.to_dict()
+        file = request.files.get("profile_pic")
+        if file:
+            print("File received")
+            data["profile_pic"] = file
+        del data["password"]
+        update_user(
+            user_id=current_user.id,
+            data=data,
+        )
+        flash("Profile Updated", "success")
+        return redirect(url_for("customer.home"))
+    return render_template("customer/edit.html")
+
+
+@customer_view_bp.route("/change_password", methods=["POST"])
+@role_required(AllowableRoles.CUSTOMER)
+def change_password():
+    old_password = request.form.get("old_password")
+    new_password = request.form.get("new_password")
+    cpassword = request.form.get("confirm_password")
+
+    if not cpassword or not new_password or not old_password:
+        flash("All fields are required", "danger")
+        return redirect(url_for("customer.edit_profile"))
+    if not cpassword == new_password:
+        flash("Passwords do not match", "danger")
+        return redirect(url_for("customer.edit_profile"))
+    if not current_user.check_password(old_password):
+        flash("Incorrect Password", "danger")
+        return redirect(url_for("customer.edit_profile"))
+
+    current_user.set_password(new_password)
+    db.session.commit()
+    flash("Password Updated", "success")
+    return redirect(url_for("public.logout"))
