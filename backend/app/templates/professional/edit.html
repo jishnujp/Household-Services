@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <form method="POST" enctype="multipart/form-data">
+        <!-- Username (non-editable) -->
+        <div class="form-group mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input name="username" class="form-control" type="text" id="username" value="{{ current_user.username }}"
+                readonly disabled>
+        </div>
+
+        <!-- Full Name (non-editable) -->
+        <div class="form-group mb-3">
+            <label for="full_name" class="form-label">Full Name</label>
+            <input name="full_name" class="form-control" type="text" id="full_name" value="{{ current_user.full_name }}"
+                readonly disabled>
+        </div>
+
+        <!-- Address -->
+        <div class="form-group mb-3">
+            <label for="address" class="form-label">Address</label>
+            <textarea name="address" class="form-control" id="address" rows="4"
+                required>{{ current_user.address }}</textarea>
+        </div>
+
+        <!-- Phone Number and Pin Code -->
+        <div class="row mb-3">
+            <div class="form-group col-6">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input name="phone" class="form-control" type="text" id="phone" value="{{ current_user.phone }}"
+                    required>
+            </div>
+            <div class="form-group col-6">
+                <label for="pincode" class="form-label">Pin Code</label>
+                <input name="pincode" class="form-control" type="text" id="pincode" value="{{ current_user.pincode }}"
+                    required>
+            </div>
+        </div>
+
+
+        <!-- Profile Picture -->
+        <div class="form-group mb-3">
+            <label for="profile_pic" class="form-label">Change Profile Picture</label>
+            <div class="mb-2">
+                <img src="{{ url_for('public.uploaded_image', filename=current_user.profile_pic) }}"
+                    alt="Profile Picture" width="100" height="100">
+            </div>
+            <input name="profile_pic" class="form-control" type="file" id="profile_pic" accept="image/jpeg, image/png">
+        </div>
+        <div class="alert alert-warning" role="alert">
+            Please note that any changes to experience details or service will require re-verification.
+        </div>
+
+        <!-- Service  -->
+        <div class="form-group mb-3">
+            <label for="service_id" class="form-label">Service</label>
+            <select class="form-control" id="service_id" name="service_id" required onchange="updateBasePrice()">
+                <option value="" data-base-price="0" selected disabled>Select a service</option>
+                {% for service in available_services %}
+                <option value="{{ service.id }}" data-base-price="{{ service.base_price }}" {% if professional_details
+                    and professional_details.service_id==service.id %} selected {% endif %}>
+                    {{ service.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <!-- Display the base price of the selected service -->
+        <div class="form-group mb-3">
+            <label for="base_price" class="form-label">Base Price (per hour)</label>
+            <input type="number" class="form-control" id="base_price" readonly
+                value="{{ professional_details.service.base_price or 0 }}">
+        </div>
+
+        <!-- Extra price -->
+        <div class="form-group mb-3">
+            <label for="extra_price" class="form-label">Extra Price</label>
+            <input name="extra_price" class="form-control" type="number" id="extra_price"
+                placeholder="Extra price that you charge above base price"
+                value="{{ professional_details.extra_price or 0 }}">
+        </div>
+
+        <!-- business_name -->
+        <div class="form-group mb-3">
+            <label for="business_name" class="form-label">Business Name</label>
+            <input name="business_name" class="form-control" type="text" id="business_name"
+                value="{{ professional_details.business_name }}" placeholder="Name of your business" readonly disabled>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea name="description" class="form-control" id="desc"
+                placeholder="Enter the description of your service" rows="4"
+                required>{{ professional_details.description or '' }}</textarea>
+        </div>
+
+        <!-- Experience -->
+        <div class="form-group mb-3">
+            <label for="experience" class="form-label">Experience</label>
+            <input name="experience" class="form-control" type="number" id="experience"
+                placeholder="Experience in years" value="{{ professional_details.experience or 0 }}" required>
+        </div>
+
+        <!-- Experience document PDF -->
+        <div class="form-group mb-3">
+            <label for="document" class="form-label">Change Experience Document ?</label>
+            <div class="mb-2">
+                <a href="{{ url_for('public.uploaded_file', filename=professional_details.document) }}"
+                    target="_blank">View current document</a>
+            </div>
+            <input name="document" class="form-control" type="file" id="document" accept="application/pdf" {% if not
+                professional_details.document %} required {% endif %}>
+        </div>
+
+        <!-- Password for verification -->
+        <div class="form-group col-6">
+            <label for="password" class="form-label">Password</label>
+            <input name="password" class="form-control" type="password" id="password">
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+        </div>
+    </form>
+    {% include 'components/change_password_modal.html' %}
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    function updateBasePrice() {
+        const serviceDropdown = document.getElementById("service_id");
+        const selectedOption = serviceDropdown.options[serviceDropdown.selectedIndex];
+        const basePrice = selectedOption.getAttribute("data-base-price");
+        document.getElementById("base_price").value = basePrice || 0;
+    }
+</script>
+{% endblock %}

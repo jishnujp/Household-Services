@@ -3,6 +3,7 @@ from .professional import (
     create_professional,
     search_professional,
     activate_professional,
+    update_professional,
 )
 from .services import (
     create_service,

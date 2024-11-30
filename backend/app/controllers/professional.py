@@ -105,3 +105,34 @@ def activate_professional(id: int):
     except Exception as e:
         print("Error in activating professional", e)
         return False, "Error in activating professional"
+
+
+def update_professional(id: int, data: dict):
+    from app.controllers.user import update_user
+
+    professional = ProfessionalDetails.query.get(id)
+    user = update_user(id, data)
+    if "document" in data:
+        pdf_file = save_file(data["document"])
+        professional.document = pdf_file
+        data["document"] = pdf_file
+        data["is_deactivated"] = True
+
+    if "service_id" in data and professional.service_id != data["service_id"]:
+        data["is_deactivated"] = True
+    if "experience" in data and professional.experience != data["experience"]:
+        data["is_deactivated"] = True
+
+    for key, value in data.items():
+        print("_" * 50)
+        print(key, value)
+        print("_" * 50)
+
+        if key in ["business_name", "avg_rating", "service"]:
+            continue
+        if key in ["experience", "extra_price"]:
+            value = int(value)
+        if hasattr(professional, key):
+            setattr(professional, key, value)
+    db.session.commit()
+    return professional

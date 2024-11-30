@@ -6,7 +6,7 @@ from flask_login import current_user
 from app.models import User
 from app.utils import role_required
 from app import db
-from app.controllers import search_service_requests
+from app.controllers import search_service_requests, update_professional, search_service
 from app.utils.constants import AllowableRoles, ServiceRequestStatus
 
 professional_view_bp = Blueprint(
@@ -142,3 +142,57 @@ def toggle_issue(id):
     db.session.commit()
     flash("Issue Raised", "success")
     return redirect(url_for("professional.home"))
+
+
+@professional_view_bp.route("/edit_profile", methods=["GET", "POST"])
+@role_required(AllowableRoles.PROFESSIONAL)
+def edit_profile():
+    if request.method == "POST":
+        password = request.form.get("password")
+        # check if password is correct
+        if not current_user.check_password(password):
+            flash("Incorrect Password", "danger")
+            return redirect(url_for("professional.edit_profile"))
+        data = request.form.to_dict()
+        for key in ["profile_pic", "document"]:
+            file = request.files.get(key)
+            if file:
+                data[key] = file
+
+        del data["password"]
+        update_professional(
+            id=current_user.id,
+            data=data,
+        )
+        flash("Profile Updated", "success")
+        return redirect(url_for("professional.home"))
+    available_services = search_service()
+    professional_details = User.get_user(current_user.id).professional_details
+    return render_template(
+        "professional/edit.html",
+        available_services=available_services,
+        professional_details=professional_details,
+    )
+
+
+@professional_view_bp.route("/change_password", methods=["POST"])
+@role_required(AllowableRoles.PROFESSIONAL)
+def change_password():
+    old_password = request.form.get("old_password")
+    new_password = request.form.get("new_password")
+    cpassword = request.form.get("confirm_password")
+
+    if not cpassword or not new_password or not old_password:
+        flash("All fields are required", "danger")
+        return redirect(url_for("professional.edit_profile"))
+    if not cpassword == new_password:
+        flash("Passwords do not match", "danger")
+        return redirect(url_for("professional.edit_profile"))
+    if not current_user.check_password(old_password):
+        flash("Incorrect Password", "danger")
+        return redirect(url_for("professional.edit_profile"))
+
+    current_user.set_password(new_password)
+    db.session.commit()
+    flash("Password Updated", "success")
+    return redirect(url_for("public.logout"))
