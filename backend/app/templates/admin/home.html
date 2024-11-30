@@ -110,7 +110,7 @@
             </thead>
             <tbody>
                 {% for request in service_requests %}
-                <tr>
+                <tr class="{% if request.cust_issue_raised or request.prof_issue_raised %}table-danger{% endif %}">
                     <td>{{ request.id }}</td>
                     <td>{{ request.professional_details.user.username }}</td>
                     <td>{{ request.created_at.date() }}</td>

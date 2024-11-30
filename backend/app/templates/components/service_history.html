@@ -16,7 +16,7 @@
             </thead>
             <tbody>
                 {% for request in request_history %}
-                <tr>
+                <tr class="{% if request.cust_issue_raised %}table-danger{% endif %}">
                     <td>{{ request.id }}</td>
                     <td>{{ request.date_of_service }}</td>
                     <td>{{ request.professional_details.service.name }}</td>

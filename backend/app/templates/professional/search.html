@@ -52,7 +52,7 @@
         </thead>
         <tbody>
             {% for request in service_requests %}
-            <tr>
+            <tr class="{% if request.prof_issue_raised %}table-danger{% endif %}">
                 <td>{{ request.id }}</td>
                 <td>{{ request.created_at.date() }}</td>
                 <td>{{ request.date_of_service }}</td>

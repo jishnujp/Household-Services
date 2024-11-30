@@ -27,7 +27,7 @@
         </tr>
     </thead>
     {% for request in todays_services %}
-    <tr>
+    <tr class="{% if request.prof_issue_raised %}table-danger{% endif %}">
         <td>{{ request.id }}</td>
         <td>{{ request.user.full_name }}</td>
         <td>{{ request.user.phone }}</td>
@@ -62,7 +62,7 @@
         </tr>
     </thead>
     {% for request in upcoming_services %}
-    <tr>
+    <tr class="{% if request.prof_issue_raised %}table-danger{% endif %}">
         <td>{{ request.id }}</td>
         <td>{{ request.user.full_name }}</td>
         <td>{{ request.user.phone }}</td>
@@ -94,19 +94,22 @@
             <th>Contact Number</th>
             <th>Location</th>
             <th>Date</th>
-            <th>Review</th>
             <th>Rating</th>
+            <th>Action</th>
         </tr>
     </thead>
-    {% for service in completed_services %}
-    <tr>
-        <td>{{ service.id }}</td>
-        <td>{{ service.user.full_name }}</td>
-        <td>{{ service.user.phone }}</td>
-        <td>{{ service.user.address }} <br>Pincode: {{ service.user.pincode }} </td>
-        <td>{{ service.date_of_service }}</td>
-        <td>{{ service.review }}</td>
-        <td>{{ service.rating }}</td>
+    {% for request in completed_services %}
+    <tr class="{% if request.prof_issue_raised %}table-danger{% endif %}">
+        <td>{{ request.id }}</td>
+        <td>{{ request.user.full_name }}</td>
+        <td>{{ request.user.phone }}</td>
+        <td>{{ request.user.address }} <br>Pincode: {{ request.user.pincode }} </td>
+        <td>{{ request.date_of_service }}</td>
+        <td>{{ request.review }}</td>
+        <td>{{ request.rating }}</td>
+        <td>
+            {% include 'components/view_review_modal.html' %}
+        </td>
     </tr>
     {% endfor %}
 </table>
