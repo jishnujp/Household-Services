@@ -52,7 +52,7 @@ def login():
         if not user:
             flash("User not found", "danger")
             return redirect(url_for("public.login"))
-        elif user.password != password:
+        elif not user.check_password(password):
             flash("Incorrect password", "danger")
             return redirect(url_for("public.login"))
         elif user.is_deactivated:
@@ -61,12 +61,12 @@ def login():
         elif chosen_role not in [role.name for role in user.roles]:
             flash("You are not authorized to access this role", "danger")
             return redirect(url_for("public.login"))
-
-        # Successful login
-        login_user(user)
-        session["role"] = chosen_role
-        flash("Login successful", "success")
-        return redirect(url_for(f"{chosen_role}.home"))
+        else:
+            # Successful login
+            login_user(user)
+            session["role"] = chosen_role
+            flash("Login successful", "success")
+            return redirect(url_for(f"{chosen_role}.home"))
     else:
         print("Form not validated")
         print(form.errors)

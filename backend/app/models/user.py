@@ -89,3 +89,16 @@ class User(BaseModel, UserMixin):
 
     def is_active(self):
         return not self.is_deactivated
+
+    def is_authenticated(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def check_password(self, password):
+        return password == self.password
+
+    def set_password(self, password):
+        self.password = password
+        db.session.commit()
