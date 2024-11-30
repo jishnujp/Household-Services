@@ -148,10 +148,10 @@
                     <td>
                         {% if professional.is_deactivated == True %}
                         <a href="{{ url_for('admin.approve_professional', id=professional.id) }}"
-                            class="btn btn-success">Approve</a>
+                            class="btn btn-success">Activate</a>
                         {% else %}
                         <a href="{{ url_for('admin.block_professional', id=professional.id) }}"
-                            class="btn btn-danger">block</a>
+                            class="btn btn-danger">Deactivate</a>
                         {% endif %}
                         {% include 'components/view_professional_modal.html' %}
 

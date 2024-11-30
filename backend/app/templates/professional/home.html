@@ -23,6 +23,7 @@
             <th>Customer Name</th>
             <th>Contact Number</th>
             <th>Location</th>
+            <th>Remarks</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -36,6 +37,9 @@
         </td>
         <td>{{ request.user.phone }}</td>
         <td>{{ request.user.address }} <br>Pincode: {{ request.user.pincode }} </td>
+        <td class="text-wrap text-break text-truncate" style="max-width: 150px;">
+            {{ request.remarks }}
+        </td>
         <td>
             {% if request.status == 'Pending' %}
             <a href="{{ url_for('professional.accept_service_request', id=request.id) }}"
