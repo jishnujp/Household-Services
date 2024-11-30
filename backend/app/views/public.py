@@ -40,7 +40,8 @@ def home():
 @public_view_bp.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
-
+    print("Request Method:", request.method)  # Print the request method
+    print("Form Data:", form.data)
     if form.validate_on_submit():
         messages = []
         username = form.username.data
@@ -48,7 +49,7 @@ def login():
         chosen_role = form.role.data
 
         user = User.query.filter_by(username=username).first()
-
+        print("User:", user)
         if not user:
             flash("User not found", "danger")
             return redirect(url_for("public.login"))
@@ -64,12 +65,10 @@ def login():
         else:
             # Successful login
             login_user(user)
+            print("User logged in")
             session["role"] = chosen_role
             flash("Login successful", "success")
             return redirect(url_for(f"{chosen_role}.home"))
-    else:
-        print("Form not validated")
-        print(form.errors)
 
     return render_template("login.html", form=form)
 

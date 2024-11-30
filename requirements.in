@@ -3,4 +3,11 @@ flask-sqlalchemy
 python-dotenv
 pandas
 numpy
+Flask-Migrate
+Flask-login
+Flask-WTF
+Flask-Restful
+plotly
+requests
+email_validator
 

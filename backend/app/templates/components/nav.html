@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <!-- Brand on the left -->
         <!-- logo image -->
-        {% if session.get('role') in ['professional', 'customer'] %}
+        {% if current_user.is_authenticated and session.get('role') in ['professional', 'customer'] %}
         <a class="navbar-brand" href="{{ url_for(session.get('role')+'.edit_profile') }}">
             <img src="{{ url_for('public.uploaded_image', filename=current_user.profile_pic) }}" alt="profile"
                 width="28" height="28" class="rounded-circle">

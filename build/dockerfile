@@ -1,0 +1,19 @@
+FROM python:3.11-slim
+
+
+WORKDIR /flask_app
+
+COPY requirements.txt /flask_app/
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY ./backend/ /flask_app/
+
+EXPOSE 5000
+
+
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_APP=run.py
+
+RUN chmod +x /flask_app/scripts/start.sh
+CMD ["/flask_app/scripts/start.sh"]
