@@ -1,6 +1,6 @@
 <!-- Button trigger modal -->
 {% if service %}
-{% set id_name = 'edit_' + service.name %}
+{% set id_name = 'edit_' + service.name.replace(' ', '') %}
 {% set url = url_for('admin.edit_service', id=service.id) %}
 {% else %}
 {% set id_name = 'add-service' %}
