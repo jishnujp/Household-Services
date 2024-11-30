@@ -38,7 +38,17 @@
                 <p><strong>Contact: </strong>{{ request.user.phone }}</p>
                 {% endif %}
                 <hr>
-                <p><strong>Service Status: </strong>{{ request.status }}</p>
+                <p><strong>Service Status: </strong>
+                <div class="badge {% if request.status == 'Pending' %}text-bg-warning
+                    {% elif request.status == 'Accepted' %}text-bg-primary
+                    {% elif request.status == 'Rejected' %}text-bg-secondary
+                    {% elif request.status == 'Completed' %}text-bg-success
+                    {%else%}text-bg-dark
+                    {% endif %}
+                    ">
+                    {{ request.status }}
+                </div>
+                </p>
                 {% if session['role'] == 'customer' %}
                 <form action="{{ url_for('customer.toggle_issue', id=request.id)}}" method="POST">
                     {% if request.cust_issue_raised %}

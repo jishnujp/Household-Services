@@ -60,7 +60,17 @@
                     {% set user = request.user %}
                     {% include 'components/view_user_modal.html' %}
                 </td>
-                <td>{{ request.status }}</td>
+                <td>
+                    <div class="badge {% if request.status == 'Pending' %}text-bg-warning
+                {% elif request.status == 'Accepted' %}text-bg-primary
+                {% elif request.status == 'Rejected' %}text-bg-secondary
+                {% elif request.status == 'Completed' %}text-bg-success
+                {%else%}text-bg-dark
+                {% endif %}
+                ">
+                        {{ request.status }}
+                    </div>
+                </td>
                 <td>
                     {% include 'components/view_review_modal.html' %}
                 </td>

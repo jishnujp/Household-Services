@@ -30,7 +30,17 @@
                         {% include 'components/view_professional_modal.html' %}
                     </td>
 
-                    <td>{{ request.status }}</td>
+                    <td>
+                        <div class="badge {% if request.status == 'Pending' %}text-bg-warning
+                {% elif request.status == 'Accepted' %}text-bg-primary
+                {% elif request.status == 'Rejected' %}text-bg-secondary
+                {% elif request.status == 'Completed' %}text-bg-success
+                {%else%}text-bg-dark
+                {% endif %}
+                ">
+                            {{ request.status }}
+                        </div>
+                    </td>
                     <td>
                         {% if request.status == 'Accepted' %}
                         <a href="{{ url_for('customer.close_service_request', id=request.id) }}"

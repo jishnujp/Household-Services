@@ -189,7 +189,17 @@
                 <td>{{ request.professional_details.user.username }}
                     {% set professional = request.professional_details %}
                     {% include 'components/view_professional_modal.html' %}
-                <td>{{ request.status }}</td>
+                <td>
+                    <div class="badge {% if request.status == 'Pending' %}text-bg-warning
+                {% elif request.status == 'Accepted' %}text-bg-primary
+                {% elif request.status == 'Rejected' %}text-bg-secondary
+                {% elif request.status == 'Completed' %}text-bg-success
+                {%else%}text-bg-dark
+                {% endif %}
+                ">
+                        {{ request.status }}
+                    </div>
+                </td>
                 <td>
                     {% include 'components/view_review_modal.html' %}
                 </td>
