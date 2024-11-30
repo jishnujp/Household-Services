@@ -114,14 +114,14 @@
                 <tr class="{% if request.cust_issue_raised or request.prof_issue_raised %}table-danger{% endif %}">
                     <td>{{ request.id }}</td>
                     <td>
-                        {% set user = request.user %}
-                        {% set modal_trigger_type = 'link' %}
-                        {% include 'components/view_user_modal.html' %}
-                    </td>
-                    <td>
                         {% set professional = request.professional_details %}
                         {% set modal_trigger_type = 'link' %}
                         {% include 'components/view_professional_modal.html' %}
+                    </td>
+                    <td>
+                        {% set user = request.user %}
+                        {% set modal_trigger_type = 'link' %}
+                        {% include 'components/view_user_modal.html' %}
                     </td>
                     <td>{{ request.date_of_service }}</td>
                     <td>
