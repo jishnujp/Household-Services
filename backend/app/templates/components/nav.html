@@ -2,8 +2,16 @@
     <div class="container-fluid">
         <!-- Brand on the left -->
         <!-- logo image -->
+        {% if session.get('role') in ['professional', 'customer'] %}
+        <a class="navbar-brand" href="{{ url_for(session.get('role')+'.edit_profile') }}">
+            <img src="{{ url_for('public.uploaded_image', filename=current_user.profile_pic) }}" alt="profile"
+                width="28" height="28" class="rounded-circle">
+            {{ current_user.full_name.capitalize() }}
+        </a>
+        {% else %}
         <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="logo"
-                width="28" height="28">Household</a>
+                width="28" height="28" class="rounded-circle">Household</a>
+        {% endif %}
         <!-- <a class="navbar-brand" href="#">Household</a> -->
 
         <!-- Toggler button for mobile view -->
@@ -53,6 +61,7 @@
                     <a class="nav-link" href="{{ url_for('public.login') }}">Login</a>
                     {%endif%}
                 </li>
+
             </ul>
         </div>
     </div>
