@@ -116,6 +116,9 @@ def book_service(id):
     if request.method == "POST":
         service_date = request.form.get("service_date")
         service_date = datetime.strptime(service_date, "%Y-%m-%d")
+        if current_user.id == id:
+            flash("You cannot book your own service", "danger")
+            return redirect(url_for("customer.home"))
         stat, msg = create_service_request(
             customer_id=current_user.id,
             professional_details_id=id,
