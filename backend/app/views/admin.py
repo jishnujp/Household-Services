@@ -236,11 +236,14 @@ def summary():
     # get all the customer ratings
     customer_ratings = {i: 0 for i in range(6)}
     all_service_requests = search_service_requests()
+    issues_count = 0
     for service_request in all_service_requests:
         if service_request.rating:
             customer_ratings[service_request.rating] += 1
         else:
             customer_ratings[0] += 1
+        if service_request.cust_issue_raised or service_request.prof_issue_raised:
+            issues_count += 1
     rating_fig = px.bar(
         x=list(customer_ratings.keys()),
         y=list(customer_ratings.values()),
@@ -266,4 +269,5 @@ def summary():
         "admin/summary.html",
         rating_plot_html=rating_plot_html,
         status_plot_html=status_plot_html,
+        issues_count=issues_count,
     )
