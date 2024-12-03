@@ -244,6 +244,8 @@ def summary():
             customer_ratings[0] += 1
         if service_request.cust_issue_raised or service_request.prof_issue_raised:
             issues_count += 1
+    # drop the 0 rating
+    customer_ratings.pop(0)
     rating_fig = px.bar(
         x=list(customer_ratings.keys()),
         y=list(customer_ratings.values()),

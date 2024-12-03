@@ -90,6 +90,8 @@ def summary():
             completed += 1
         else:
             pending += 1
+    # drop the 0 rating
+    customer_ratings.pop(0)
 
     rating_fig = px.bar(
         x=list(customer_ratings.keys()),
