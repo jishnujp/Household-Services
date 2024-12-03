@@ -93,7 +93,7 @@ def rate_and_review(service_request_id, data):
             if service_request.rating
         ]
         print("ALL rating", all_ratings)
-        professional.avg_rating = sum(all_ratings) / len(all_ratings)
+        professional.avg_rating = round(sum(all_ratings) / len(all_ratings), 2)
         db.session.commit()
         return True, "Rated and reviewed successfully"
     except Exception as e:
