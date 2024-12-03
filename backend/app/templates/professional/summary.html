@@ -4,6 +4,10 @@
 
 {% block content %}
 <h1 class="text-center">Ratings Summary</h1>
-
+<strong>Avg Rating:</strong> {{your_rating}}<br>
 {{ rating_fig|safe }}
+
+<hr>
+<strong>Pending requests: </strong> {{pending}}<br>
+<strong>Completed requests: </strong> {{completed}}<br>
 {% endblock %}

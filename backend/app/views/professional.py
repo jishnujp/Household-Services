@@ -6,6 +6,7 @@ from flask_login import current_user
 from app.models import User
 from app.utils import role_required
 from app import db
+from app.models import ProfessionalDetails
 from app.controllers import search_service_requests, update_professional, search_service
 from app.utils.constants import AllowableRoles, ServiceRequestStatus
 
@@ -78,18 +79,31 @@ def summary():
     all_service_requests = search_service_requests(
         professional_details_id=current_user.id
     )
+    pending, completed = 0, 0
+    your_rating = ProfessionalDetails.query.get(current_user.id).avg_rating
     for service_request in all_service_requests:
         if service_request.rating:
             customer_ratings[service_request.rating] += 1
         else:
             customer_ratings[0] += 1
+        if service_request.status == ServiceRequestStatus.COMPLETED:
+            completed += 1
+        else:
+            pending += 1
+
     rating_fig = px.bar(
         x=list(customer_ratings.keys()),
         y=list(customer_ratings.values()),
         labels={"x": "Rating", "y": "Count"},
     )
     rating_fig = pio.to_html(rating_fig)
-    return render_template("professional/summary.html", rating_fig=rating_fig)
+    return render_template(
+        "professional/summary.html",
+        rating_fig=rating_fig,
+        your_rating=your_rating,
+        pending=pending,
+        completed=completed,
+    )
 
 
 @professional_view_bp.route("/accept_service/<int:id>")
