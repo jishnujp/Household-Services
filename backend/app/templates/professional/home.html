@@ -133,7 +133,7 @@
             <br>
             <div class="star-rating">
                 {% for i in range(5, 0, -1) %}
-                <input type="radio" name="rating" id="{{request.id}}-star{{ i }}" value="{{ i }}" {% if
+                <input type="radio" name="{{request.id}}-rating" id="{{request.id}}-star{{ i }}" value="{{ i }}" {% if
                     request.rating==i %} checked {% endif %} disabled>
                 <label for="{{request.id}}-star{{ i }}" class="bi bi-star-fill"></label>
                 {% endfor %}
